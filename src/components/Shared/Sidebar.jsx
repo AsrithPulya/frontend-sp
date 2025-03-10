@@ -1,61 +1,60 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faTachometerAlt,
+  faUserPlus,
+  faBox,
+  faExchangeAlt,
+  faCog,
+  faQuestionCircle,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const menuItems = [
+    { path: "/Dashboard", label: "Dashboard", icon: faTachometerAlt },
+    { path: "/Profile", label: "OnBoarding", icon: faUserPlus },
+    { path: "/products", label: "Products", icon: faBox },
+    { path: "/transactions", label: "Transactions", icon: faExchangeAlt },
+    { path: "/settings", label: "Settings", icon: faCog },
+    { path: "/help", label: "Help", icon: faQuestionCircle },
+  ];
 
   return (
     <aside
-      className={`bg-blue-900 w-64 p-4 shadow-md transform md:translate-x-0 transition-transform duration-300 ${
+      className={`fixed top-0 left-0 w-64 bg-blue-900 text-white shadow-md transition-transform duration-300 h-full min-h-screen overflow-y-auto ${
         isOpen ? "translate-x-0" : "-translate-x-full"
-      } md:static fixed top-0 left-0 h-screen z-10`}
+      } md:translate-x-0 md:static z-50`}
     >
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-semibold text-white">Menu</h2>
+      {/* Sidebar Header */}
+      <div className="flex justify-between items-center p-4 border-b border-blue-700">
+        <h2 className="text-lg font-semibold">Menu</h2>
         <button
           onClick={toggleSidebar}
-          className="md:hidden text-gray-300 hover:text-white"
+          className="md:hidden text-gray-300 hover:text-white text-2xl"
+          aria-label="Close Sidebar"
         >
           ✕
         </button>
       </div>
-      <nav className="space-y-2">
-        <button
-          onClick={() => navigate("/Dashboard")}
-          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
-        >
-          Dashboard
-        </button>
-        <button
-          onClick={() => navigate("/Profile")}
-          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
-        >
-          OnBoarding
-        </button>
-        <button
-          onClick={() => navigate("/transactions")}
-          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
-        >
-          Products
-        </button>
-        <button
-          onClick={() => navigate("/transactions")}
-          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
-        >
-          Transactions
-        </button>
-        <button
-          onClick={() => navigate("/settings")}
-          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
-        >
-          Settings
-        </button>
-        <button
-          onClick={() => navigate("/help")}
-          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
-        >
-          Help
-        </button>
+
+      {/* Sidebar Navigation */}
+      <nav className="p-4 space-y-2">
+        {menuItems.map(({ path, label, icon }) => (
+          <button
+            key={path}
+            onClick={() => navigate(path)}
+            className={`flex items-center w-full text-left p-2 rounded-md transition duration-200 ${
+              location.pathname === path ? "bg-blue-700" : "hover:bg-blue-800"
+            }`}
+          >
+            <FontAwesomeIcon icon={icon} className="mr-3" />
+            {label}
+          </button>
+        ))}
       </nav>
     </aside>
   );

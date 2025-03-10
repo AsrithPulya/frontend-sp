@@ -16,27 +16,28 @@ const BankDetails = ({ formData, setFormData, prevStep, nextStep }) => {
 
   const verifyBankDetails = async () => {
     try {
-      // Mock API call for verification
-      const response = await fetch("/api/verify-bank", {
-        method: "POST",
-        body: JSON.stringify({
-          accountNumber: formData.accountNumber,
-          ifsc: formData.ifsc,
-        }),
-      });
-      const result = await response.json();
-      if (result.success) {
-        setVerificationStatus("Successfully Verified");
+      // Simulating an API delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+  
+      // Mock validation logic
+      const isValidAccount = /^[0-9]{9,18}$/.test(formData.accountNumber);
+      const isValidIFSC = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc);
+  
+      if (isValidAccount && isValidIFSC) {
+        setVerificationStatus("✅ Successfully Verified");
         setIsVerified(true);
       } else {
-        setVerificationStatus("Verification Failed. Please check your details.");
+        setVerificationStatus("❌ Invalid Account Number or IFSC Code");
         setIsVerified(false);
       }
     } catch (error) {
-      setVerificationStatus("Error verifying bank details. Try again.");
+      console.error("Verification Error:", error);
+      setVerificationStatus("⚠️ Error verifying bank details. Try again.");
       setIsVerified(false);
     }
   };
+  
+  
 
   return (
     <div className="space-y-6">
