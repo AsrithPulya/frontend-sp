@@ -7,8 +7,6 @@ const Registration = () => {
   const [formData, setFormData] = useState({
     contact: "",
     otp: "",
-    pin: "",
-    confirmPin: "",
     role: "Self",
   });
   const [error, setError] = useState("");
@@ -30,15 +28,7 @@ const Registration = () => {
   const verifyOtp = () => {
     if (formData.otp !== "123456") return setError("Invalid OTP. Try again.");
     setError("");
-    setStep(3);
-  };
-
-  const handlePinSetup = () => {
-    if (formData.pin.length !== 4 || isNaN(formData.pin))
-      return setError("PIN must be a 4-digit number.");
-    if (formData.pin !== formData.confirmPin) return setError("PINs do not match.");
-    localStorage.setItem("appPin", formData.pin);
-    alert("PIN Set Successfully!");
+    alert("Registration Successful!");
     navigate("/dashboard");
   };
 
@@ -48,7 +38,7 @@ const Registration = () => {
         <div className="flex flex-col items-center mb-6">
           <img src={logo} alt="Company Logo" className="w-24 h-24 mb-4" />
           <h2 className="text-2xl font-bold text-gray-800">
-            {step === 1 ? "Register" : step === 2 ? "Verify OTP" : "Set App PIN"}
+            {step === 1 ? "Register" : "Verify OTP"}
           </h2>
         </div>
 
@@ -102,33 +92,6 @@ const Registration = () => {
               className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200"
             >
               Verify OTP
-            </button>
-          </>
-        )}
-        {step === 3 && (
-          <>
-            <p className="text-gray-600 mb-4 text-center">Set a 4-digit App PIN for quick login.</p>
-            <input
-              type="password"
-              name="pin"
-              placeholder="Enter 4-digit PIN"
-              maxLength={4}
-              onChange={handleChange}
-              className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="password"
-              name="confirmPin"
-              placeholder="Confirm 4-digit PIN"
-              maxLength={4}
-              onChange={handleChange}
-              className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={handlePinSetup}
-              className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200"
-            >
-              Set PIN
             </button>
           </>
         )}
