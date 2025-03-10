@@ -44,7 +44,7 @@ const Login = () => {
   const handleVerifyPin = () => {
     if (appPin === mockPin) {
       alert("PIN Verified! Welcome to the App.");
-      navigate("/welcome");
+      navigate("/Dashbaord");
     } else {
       setError("Incorrect PIN. Try again.");
     }
