@@ -50,8 +50,10 @@ const Dashboard = () => {
       <Navbar toggleSidebar={toggleSidebar} />
 
       <div className="flex flex-1">
-        {/* Sidebar */}
-        <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+        {/* Sidebar with full height */}
+        <div className="h-screen">
+          <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+        </div>
 
         {/* Main Content */}
         <main className="flex-1 p-6 md:p-8">
@@ -124,5 +126,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;
