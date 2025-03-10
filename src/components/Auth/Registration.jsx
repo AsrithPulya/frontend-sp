@@ -1,18 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/Logo.jpeg"
+import logo from "../assets/Logo.jpeg";
 
 const Registration = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    email: "",
-    mobile: "",
-    password: "",
-    confirmPassword: "",
-    role: "Self",
+    contact: "",
     otp: "",
     pin: "",
     confirmPin: "",
+    role: "Self",
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -24,12 +21,10 @@ const Registration = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { email, mobile, password, confirmPassword } = formData;
-    if (!email || !mobile || !password || !confirmPassword)
-      return setError("All fields are required.");
-    if (password !== confirmPassword) return setError("Passwords do not match.");
+    if (!formData.contact) return setError("Email or Phone Number is required.");
     setError("");
     setStep(2);
+    alert("OTP Sent Successfully (Mock: 123456)");
   };
 
   const verifyOtp = () => {
@@ -57,18 +52,14 @@ const Registration = () => {
           </h2>
         </div>
 
-        {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
-        )}
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
         {step === 1 && (
           <form onSubmit={handleSubmit}>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              Select Your Role
-            </h3>
-            <div className="flex flex-wrap gap-4 mb-4">
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">Select Your Role</h3>
+            <div className="flex flex-wrap justify-between mb-6">
               {roles.map((role) => (
-                <label key={role} className="flex items-center space-x-2">
+                <label key={role} className="flex items-center space-x-2 whitespace-nowrap">
                   <input
                     type="radio"
                     name="role"
@@ -82,30 +73,9 @@ const Registration = () => {
               ))}
             </div>
             <input
-              type="email"
-              name="email"
-              placeholder="Enter Email"
-              onChange={handleChange}
-              className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
               type="text"
-              name="mobile"
-              placeholder="Enter Mobile Number"
-              onChange={handleChange}
-              className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Enter Password"
-              onChange={handleChange}
-              className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
+              name="contact"
+              placeholder="Enter Email or Phone Number"
               onChange={handleChange}
               className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -119,9 +89,7 @@ const Registration = () => {
         )}
         {step === 2 && (
           <>
-            <p className="text-gray-600 mb-4 text-center">
-              Enter OTP sent to your mobile/email.
-            </p>
+            <p className="text-gray-600 mb-4 text-center">Enter OTP sent to your mobile/email.</p>
             <input
               type="text"
               name="otp"
@@ -139,9 +107,7 @@ const Registration = () => {
         )}
         {step === 3 && (
           <>
-            <p className="text-gray-600 mb-4 text-center">
-              Set a 4-digit App PIN for quick login.
-            </p>
+            <p className="text-gray-600 mb-4 text-center">Set a 4-digit App PIN for quick login.</p>
             <input
               type="password"
               name="pin"
