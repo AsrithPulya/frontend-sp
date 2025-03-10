@@ -17,7 +17,7 @@ const BusinessDetails = ({ formData, setFormData, nextStep, prevStep }) => {
   const isFormValid =
     formData.businessName &&
     formData.businessType &&
-    formData.businessAddress &&
+    
     validatePAN(formData.firmPanNumber) &&
     formData.firmPanFile;
 
@@ -58,19 +58,7 @@ const BusinessDetails = ({ formData, setFormData, nextStep, prevStep }) => {
       </div>
 
       {/* Business Address */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Business Address
-        </label>
-        <textarea
-          name="businessAddress"
-          placeholder="Enter your business address"
-          rows={3}
-          value={formData.businessAddress}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+      
 
       {/* Firm PAN Number */}
       <div>

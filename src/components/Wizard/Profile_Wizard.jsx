@@ -47,7 +47,7 @@ const ProfileWizard = () => {
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
         {/* Main content */}
-        <div className="flex-1 md:ml-64 pt-16 flex items-center justify-center">
+        <div className="flex-1 md:ml-64 pt-16 flex items-center justify-center ">
           {/* Overlay for mobile when sidebar is open */}
           {isSidebarOpen && (
             <div

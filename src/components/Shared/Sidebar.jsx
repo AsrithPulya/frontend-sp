@@ -8,7 +8,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     <aside
       className={`bg-blue-900 w-64 p-4 shadow-md transform md:translate-x-0 transition-transform duration-300 ${
         isOpen ? "translate-x-0" : "-translate-x-full"
-      } md:static fixed top-0 left-0 h-full z-10`}
+      } md:static fixed top-0 left-0 h-screen z-10`}
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold text-white">Menu</h2>
