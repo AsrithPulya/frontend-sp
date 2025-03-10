@@ -27,22 +27,34 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           Dashboard
         </button>
         <button
+          onClick={() => navigate("/Profile")}
+          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
+        >
+          OnBoarding
+        </button>
+        <button
+          onClick={() => navigate("/transactions")}
+          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
+        >
+          Products
+        </button>
+        <button
           onClick={() => navigate("/transactions")}
           className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
         >
           Transactions
         </button>
         <button
-          onClick={() => navigate("/Profile")}
-          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
-        >
-          Profile
-        </button>
-        <button
           onClick={() => navigate("/settings")}
           className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
         >
           Settings
+        </button>
+        <button
+          onClick={() => navigate("/help")}
+          className="w-full text-left p-2 text-gray-200 hover:bg-blue-800 rounded-md transition duration-200"
+        >
+          Help
         </button>
       </nav>
     </aside>

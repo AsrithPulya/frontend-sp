@@ -28,7 +28,7 @@ const Navbar = ({ toggleSidebar }) => {
         >
           ☰
         </button>
-        <h1 className="text-xl font-bold">SabPe Dashboard</h1>
+        <h1 className="text-xl font-bold">SabbPe Dashboard</h1>
       </div>
       <div className="flex items-center space-x-4">
         <span className="text-sm">{user.name}</span>

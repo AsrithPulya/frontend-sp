@@ -12,7 +12,7 @@ const Login = () => {
   const [step, setStep] = useState("login");
   const navigate = useNavigate();
 
-  const mockOtp = "123456";
+  const mockOtp = "147369";
   const mockPin = "1234";
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const Login = () => {
   const handleVerifyPin = () => {
     if (appPin === mockPin) {
       alert("PIN Verified! Welcome to the App.");
-      navigate("/Dashbaord");
+      navigate("/Dashboard");
     } else {
       setError("Incorrect PIN. Try again.");
     }
