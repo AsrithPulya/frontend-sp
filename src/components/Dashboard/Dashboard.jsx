@@ -5,125 +5,142 @@ import Sidebar from "../Shared/Sidebar";
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [products, setProducts] = useState([]);
+  const [unsubscribed, setUnsubscribed] = useState([]);
+  const [subscribed, setSubscribed] = useState([]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  // Mock backend data fetch (replace with actual API call)
   useEffect(() => {
     const fetchProducts = async () => {
-      // Simulate API call
       const mockProducts = [
-        {
-          id: 1,
-          name: "Payment Gateway",
-          description: "Secure online payment processing",
-          price: "₹500/month",
-          status: "Active",
-          icon: "💳",
-        },
-        {
-          id: 2,
-          name: "QR Code Scanner",
-          description: "Fast QR payment solution",
-          price: "₹200/month",
-          status: "Active",
-          icon: "📱",
-        },
-        {
-          id: 3,
-          name: "POS Terminal",
-          description: "Physical payment terminal",
-          price: "₹1000 one-time",
-          status: "Inactive",
-          icon: "🖥️",
-        },
+        { id: 1, name: "Static UPI", description: "UPI GMV cost is 0.05%. Static QR No. 1: No Charge. Additional QR: 99+GST" },
+        { id: 2, name: "Soundbox", description: "Monthly Rental: 150+GST. One-time Setup fee: 100+GST" },
+        { id: 3, name: "Dynamic QR - UPI", description: "Monthly Rental: 250+GST. One-time Setup fee: 100+GST" },
+        { id: 4, name: "EDC Android", description: "Monthly Rental: 400+GST. Zero Rental if GMV 5 lakhs+. Setup fee: 99+GST." },
+        { id: 5, name: "EDC Linux", description: "Monthly Rental: 300+GST - Linux Device. GMV Base 3 lakhs & Above: Zero Rental" },
+        { id: 6, name: "Analytical Reports", description: "Comprehensive business analytics" },
+        { id: 7, name: "Payment Gateway & Net banking", description: "Secure online transactions." },
+        { id: 8, name: "Payout Solutions", description: "Normal Payout, Bulk Payout" },
+        { id: 9, name: "Multi-bank EMI", description: "3,6,9,12,18,24,36 Months plan. Commercials: 0.50%" },
+        { id: 10, name: "Invoice Based Payments - UPI", description: "Efficient invoice-based payment system" },
+        { id: 11, name: "SabbPe Loyalty Points", description: "Earn & Burn Points" },
+        { id: 12, name: "Gift Vouchers", description: "Please refer to website: https://www.gyftr.com/" },
+        { id: 13, name: "Wallet", description: "Gold, Silver & Cash options available" }
       ];
       setProducts(mockProducts);
+      setUnsubscribed(new Array(mockProducts.length).fill(false));
+      setSubscribed(new Array(mockProducts.length).fill(false));
     };
 
     fetchProducts();
   }, []);
 
+  const getRandomTransactions = () => Math.floor(Math.random() * 50) + 1;
+
+  const handleUnsubscribe = (productId) => {
+    setUnsubscribed((prev) =>
+      prev.map((status, index) => (index + 1 === productId ? true : status))
+    );
+    setSubscribed((prev) =>
+      prev.map((status, index) => (index + 1 === productId ? false : status))
+    );
+  };
+
+  const handleSubscribe = (productId) => {
+    setUnsubscribed((prev) =>
+      prev.map((status, index) => (index + 1 === productId ? false : status))
+    );
+    setSubscribed((prev) =>
+      prev.map((status, index) => (index + 1 === productId ? true : status))
+    );
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-200">
-      {/* Navbar */}
       <Navbar toggleSidebar={toggleSidebar} />
-
       <div className="flex flex-1">
-        {/* Sidebar with full height */}
-        <div className="h-screen">
-          <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        </div>
-
-        {/* Main Content */}
-        <main className="flex-1 p-6 md:p-8">
-          {/* Header Section */}
-          <div className="mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-              Available Packages
-            </h2>
-            <p className="text-gray-600 text-lg">
-              Discover powerful tools to grow your business seamlessly.
-            </p>
-          </div>
-
-          {/* Product Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.length > 0 ? (
-              products.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 overflow-hidden"
-                >
-                  {/* Card Header with Icon */}
-                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 flex items-center space-x-3">
-                    <span className="text-3xl">{product.icon}</span>
-                    <h3 className="text-lg font-semibold text-white">
-                      {product.name}
-                    </h3>
+        <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+        <div
+          className={`flex-1 transition-all duration-300 ${
+            isSidebarOpen ? "md:ml-64" : "md:ml-0"
+          } mt-16`}
+        >
+          <main className="p-4 md:p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Available Packages</h2>
+              <p className="text-gray-600 text-sm md:text-base">Discover powerful tools to grow your business seamlessly.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              {products.length > 0 ? (
+                products.map((product) => (
+                  <div
+                    key={product.id}
+                    className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 p-4 flex flex-col min-h-[200px]"
+                  >
+                    <div className="flex flex-col flex-grow">
+                      <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-1">{product.name}</h3>
+                      {unsubscribed[product.id - 1] ? (
+                        <p className="text-gray-500 text-xs md:text-sm mb-2 flex items-center">
+                          <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                          Requires Approval
+                        </p>
+                      ) : (
+                        <p className="text-gray-500 text-xs md:text-sm mb-2 flex items-center">
+                          <span className="font-bold">Trial Transactions:</span> {getRandomTransactions()}
+                          <svg
+                            className="w-3 h-3 md:w-4 md:h-4 ml-1 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                        </p>
+                      )}
+                      <p className="text-gray-600 text-xs md:text-sm overflow-hidden text-ellipsis">{product.description}</p>
+                    </div>
+                    <div className="flex space-x-2 mt-3 justify-between items-center">
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleUnsubscribe(product.id);
+                        }}
+                        className="text-blue-600 hover:underline text-xs md:text-sm"
+                      >
+                        Unsubscribe
+                      </a>
+                      {subscribed[product.id - 1] ? (
+                        <span className="text-green-500 font-semibold text-xs md:text-sm">Subscribed</span>
+                      ) : (
+                        <button
+                          onClick={() => handleSubscribe(product.id)}
+                          className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition-all duration-300 text-xs md:text-sm"
+                        >
+                          Subscribe
+                        </button>
+                      )}
+                    </div>
                   </div>
-
-                  {/* Card Body */}
-                  <div className="p-4">
-                    <p className="text-gray-600 text-sm mb-3">
-                      {product.description}
-                    </p>
-                    <p className="text-indigo-600 font-semibold text-lg mb-3">
-                      {product.price}
-                    </p>
-                    <span
-                      className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
-                        product.status === "Active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {product.status}
-                    </span>
-                  </div>
-
-                  {/* Card Footer */}
-                  <div className="p-4 pt-0">
-                    <button className="w-full py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-md hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md">
-                      Subscribe Now
-                    </button>
-                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10">
+                  <p className="text-gray-500 text-base md:text-lg">No products available at the moment.</p>
+                  <p className="text-gray-400">Check back later for exciting offers!</p>
                 </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-10">
-                <p className="text-gray-500 text-lg">
-                  No products available at the moment.
-                </p>
-                <p className="text-gray-400">
-                  Check back later for exciting offers!
-                </p>
-              </div>
-            )}
-          </div>
-        </main>
+              )}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
 };
+
 export default Dashboard;
