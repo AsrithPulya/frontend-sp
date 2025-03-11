@@ -10,6 +10,8 @@ import {
   faQuestionCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
+
+
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
