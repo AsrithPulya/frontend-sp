@@ -1,25 +1,34 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const BusinessDetails = ({ formData, setFormData, nextStep, prevStep }) => {
+  // Handle text input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle file input changes
   const handleFileChange = (e) => {
-    setFormData({ ...formData, firmPanFile: e.target.files[0] });
+    setFormData({ ...formData, [e.target.name]: e.target.files[0] || null });
   };
 
-  const validatePAN = (pan) => {
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-    return panRegex.test(pan);
-  };
+  // PAN and GST validation
+  const validatePAN = (pan) => /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan);
+  const validateGST = (gst) => /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst);
 
+  // Check if form is valid
   const isFormValid =
-    formData.businessName &&
-    formData.businessType &&
-    
+    formData.businessName?.trim() &&
+    formData.businessType?.trim() &&
     validatePAN(formData.firmPanNumber) &&
-    formData.firmPanFile;
+    validateGST(formData.gstNumber) &&
+    formData.firmPanFile instanceof File &&
+    formData.businessRegFile instanceof File &&
+    formData.businessAddressProof instanceof File;
+
+  // Debugging: Log form data
+  useEffect(() => {
+    console.log("Updated formData:", formData);
+  }, [formData]);
 
   return (
     <div className="space-y-6">
@@ -43,7 +52,7 @@ const BusinessDetails = ({ formData, setFormData, nextStep, prevStep }) => {
       {/* Business Type */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Business Type
+          Entity Type
         </label>
         <select
           name="businessType"
@@ -51,14 +60,27 @@ const BusinessDetails = ({ formData, setFormData, nextStep, prevStep }) => {
           onChange={handleChange}
           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">Select Business Type</option>
-          <option value="GST">GST</option>
-          <option value="MSME">MSME</option>
+          <option value="">Select Entity Type</option>
+          <option value="Sole Proprietorship">Sole Proprietorship</option>
+          <option value="Partnership">Partnership</option>
+          <option value="Private Limited">Private Limited</option>
         </select>
       </div>
 
       {/* Business Address */}
-      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Business Address
+        </label>
+        <input
+          type="text"
+          name="businessAddress"
+          placeholder="Enter your business address"
+          value={formData.businessAddress}
+          onChange={handleChange}
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
 
       {/* Firm PAN Number */}
       <div>
@@ -84,6 +106,28 @@ const BusinessDetails = ({ formData, setFormData, nextStep, prevStep }) => {
         )}
       </div>
 
+      {/* GST Number */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          GST Number
+        </label>
+        <input
+          type="text"
+          name="gstNumber"
+          placeholder="Enter your GST Number"
+          value={formData.gstNumber}
+          onChange={handleChange}
+          className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 ${
+            formData.gstNumber && !validateGST(formData.gstNumber)
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
+          }`}
+        />
+        {formData.gstNumber && !validateGST(formData.gstNumber) && (
+          <p className="text-red-500 text-sm mt-1">Invalid GST format.</p>
+        )}
+      </div>
+
       {/* Upload PAN Verification File */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -92,6 +136,32 @@ const BusinessDetails = ({ formData, setFormData, nextStep, prevStep }) => {
         <input
           type="file"
           name="firmPanFile"
+          onChange={handleFileChange}
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Business Registration Certificate Upload */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Upload Business Registration Certificate
+        </label>
+        <input
+          type="file"
+          name="businessRegFile"
+          onChange={handleFileChange}
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Business Address Proof Upload */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Upload Business Address Proof
+        </label>
+        <input
+          type="file"
+          name="businessAddressProof"
           onChange={handleFileChange}
           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />

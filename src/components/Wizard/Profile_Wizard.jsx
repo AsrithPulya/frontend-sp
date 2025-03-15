@@ -16,16 +16,23 @@ const ProfileWizard = () => {
     dob: "",
     address: "",
     pan: "",
+    panVerified: false,
+    panStatus: null,
     aadhaar: "",
+    aadhaarVerified: false,
+    aadhaarStatus: null,
     businessName: "",
     businessType: "",
     businessAddress: "",
     firmPanNumber: "",
+    firmPanVerified: false,
+    firmPanStatus: null,
     firmPanFile: null,
     bankName: "",
     accountNumber: "",
     confirmAccountNumber: "",
     ifsc: "",
+    bankVerified: false,
     bankDocument: null,
   });
 
@@ -39,19 +46,11 @@ const ProfileWizard = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {/* Navbar */}
       <Navbar toggleSidebar={toggleSidebar} />
-
       <div className="flex flex-1">
-        {/* Sidebar */}
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-
-        {/* Main Content */}
         <div className="flex-1 flex flex-col px-12 py-6">
-          {/* Form Container (Expanded Full Width) */}
           <div className="w-full bg-white p-8 rounded-xl shadow-lg">
-            
-            {/* Step Tabs (Expanding Full Width) */}
             <div className="flex justify-between border-b-2 border-gray-300 pb-3">
               {["Personal Details", "Business Details", "Bank Details", "Supporting Documents"].map(
                 (label, index) => (
@@ -67,7 +66,6 @@ const ProfileWizard = () => {
               )}
             </div>
 
-            {/* Progress Bar (Expanding Full Width) */}
             <div className="w-full h-2 bg-gray-300 rounded-md mt-4">
               <div
                 className="h-full bg-blue-600 rounded-md transition-all duration-300"
@@ -75,7 +73,6 @@ const ProfileWizard = () => {
               ></div>
             </div>
 
-            {/* Step Components */}
             <div className="w-full mt-6">
               {step === 1 && <PersonalDetails formData={formData} setFormData={setFormData} nextStep={nextStep} />}
               {step === 2 && <BusinessDetails formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />}
