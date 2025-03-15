@@ -5,6 +5,8 @@ import Register from '../src/components/Auth/Registration';
 import TransactionSuccess from './components/Transaction_Sucess';
 import ProfileWizard from './components/Wizard/Profile_Wizard';
 import Dashboard from './components/Dashboard/Dashboard';
+import Products from './components/Products';
+import UserFormPage from "../src/components/Create-User"
 function App() {
   return (
 
@@ -16,6 +18,8 @@ function App() {
               <Route path="/User-Transaction-Success" element={<TransactionSuccess />} />
               <Route path="/Profile" element={<ProfileWizard />} />
               <Route path="/Dashboard" element={<Dashboard />} />
+              <Route path="/Products" element={<Products />} />
+              <Route path="/create-user" element={<UserFormPage />} />
             </Routes>
         </BrowserRouter>
   );

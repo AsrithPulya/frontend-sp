@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo.jpeg";
+import background from "../assets/background.jpg";
 
 const Registration = () => {
   const [step, setStep] = useState(1);
@@ -22,21 +23,24 @@ const Registration = () => {
     if (!formData.contact) return setError("Email or Phone Number is required.");
     setError("");
     setStep(2);
-    alert("OTP Sent Successfully");
+    alert("OTP Sent Successfully (Mock: 123456)");
   };
 
   const verifyOtp = () => {
-    if (formData.otp !== "147369") return setError("Invalid OTP. Try again.");
+    if (formData.otp !== "123456") return setError("Invalid OTP. Try again.");
     setError("");
     alert("Registration Successful!");
     navigate("/dashboard");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <div className="flex flex-col items-center mb-6">
-          <img src={logo} alt="Company Logo" className="w-24 h-24 mb-4" />
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: `url(${background})` }}
+    >
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md relative">
+        <div className="flex items-center justify-center space-x-4 mb-6">
+          <img src={logo} alt="Company Logo" className=" absolute top-2 left-8 w-20 h-20" />
           <h2 className="text-2xl font-bold text-gray-800">
             {step === 1 ? "Register" : "Verify OTP"}
           </h2>
@@ -77,6 +81,7 @@ const Registration = () => {
             </button>
           </form>
         )}
+
         {step === 2 && (
           <>
             <p className="text-gray-600 mb-4 text-center">Enter OTP sent to your mobile/email.</p>
