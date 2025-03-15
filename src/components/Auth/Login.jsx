@@ -9,7 +9,7 @@ const Login = () => {
   const [otpSent, setOtpSent] = useState(false);
   const navigate = useNavigate();
 
-  const mockOtp = "123456";
+  const mockOtp = "147369";
 
   const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
   const isValidPhone = (phone) => /^[0-9]{10}$/.test(phone);
@@ -20,7 +20,7 @@ const Login = () => {
     }
     setOtpSent(true);
     setError("");
-    alert("OTP Sent Successfully (Mock: 123456)");
+    alert("OTP Sent Successfully");
   };
 
   const handleOtpLogin = () => {

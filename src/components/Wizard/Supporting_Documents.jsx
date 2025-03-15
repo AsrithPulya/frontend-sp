@@ -83,7 +83,7 @@ const SupportingDocuments = ({ prevStep }) => {
           Back
         </button>
         <button className="w-[120px] p-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-200">
-          Submit Documents
+          Submit 
         </button>
       </div>
     </div>

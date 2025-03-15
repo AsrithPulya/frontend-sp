@@ -22,11 +22,11 @@ const Registration = () => {
     if (!formData.contact) return setError("Email or Phone Number is required.");
     setError("");
     setStep(2);
-    alert("OTP Sent Successfully (Mock: 123456)");
+    alert("OTP Sent Successfully");
   };
 
   const verifyOtp = () => {
-    if (formData.otp !== "123456") return setError("Invalid OTP. Try again.");
+    if (formData.otp !== "147369") return setError("Invalid OTP. Try again.");
     setError("");
     alert("Registration Successful!");
     navigate("/dashboard");

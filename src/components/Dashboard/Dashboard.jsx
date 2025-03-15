@@ -19,6 +19,26 @@ const Dashboard = () => {
     setEarningsData(randomData);
   }, []);
 
+  const getRandomTransactions = () => Math.floor(Math.random() * 50) + 1;
+
+  // const handleUnsubscribe = (productId) => {
+  //   setUnsubscribed((prev) =>
+  //     prev.map((status, index) => (index + 1 === productId ? true : status))
+  //   );
+  //   setSubscribed((prev) =>
+  //     prev.map((status, index) => (index + 1 === productId ? false : status))
+  //   );
+  // };
+
+  // const handleSubscribe = (productId) => {
+  //   setUnsubscribed((prev) =>
+  //     prev.map((status, index) => (index + 1 === productId ? false : status))
+  //   );
+  //   setSubscribed((prev) =>
+  //     prev.map((status, index) => (index + 1 === productId ? true : status))
+  //   );
+  // };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-200">
       <Navbar toggleSidebar={toggleSidebar} />
@@ -123,5 +143,6 @@ const Dashboard = () => {
     </div>
   );
 };
+
 
 export default Dashboard;

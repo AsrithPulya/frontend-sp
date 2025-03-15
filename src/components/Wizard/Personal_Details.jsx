@@ -7,35 +7,29 @@ const PersonalDetails = ({ formData, setFormData, nextStep }) => {
   const [nextEnabled, setNextEnabled] = useState(false);
   const [panFile, setPanFile] = useState(null);
   const [aadhaarFront, setAadhaarFront] = useState(null);
-  const [aadhaarBack, setAadhaarBack] = useState(null);
+  
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   useEffect(() => {
-    const allFieldsFilled =
-      formData.fullName &&
-      formData.mobile &&
-      formData.email &&
-      formData.dob &&
-      formData.address &&
-      formData.pan &&
-      formData.aadhaar &&
-      panStatus?.type === "success" &&
-      aadhaarStatus?.type === "success" &&
-      aadhaarConsent &&
-      panFile &&
-      aadhaarFront &&
-      aadhaarBack;
+  const requiredFields = [
+    formData.fullName,
+    formData.mobile,
+    formData.email,
+    formData.dob,
+    formData.address,
+    formData.pan,
+    formData.aadhaar
+  ];
+  const allFieldsFilled =
+    requiredFields.every(field => field?.trim() !== "") &&
+    panStatus?.type === "success" &&
+    aadhaarStatus?.type === "success" &&
+    aadhaarConsent &&
+    panFile &&
+    aadhaarFront;
 
-    setNextEnabled(allFieldsFilled);
-  }, [
-    formData,
-    panStatus,
-    aadhaarStatus,
-    aadhaarConsent,
-    panFile,
-    aadhaarFront,
-    aadhaarBack,
-  ]);
+  setNextEnabled(allFieldsFilled);
+}, [formData.fullName, formData.mobile, formData.email, formData.dob, formData.address, formData.pan, formData.aadhaar, panStatus, aadhaarStatus, aadhaarConsent, panFile, aadhaarFront]);
 
   // PAN Validation
   const validatePAN = () => {
@@ -201,15 +195,24 @@ const PersonalDetails = ({ formData, setFormData, nextStep }) => {
               {panStatus.message}
             </div>
           )}
-          <label className="block text-sm font-medium text-gray-700 mt-4 mb-1">
-            Upload PAN Card
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setPanFile(e.target.files[0])}
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <div>
+        <label className="block text-sm font-medium text-gray-700 mt-4 mb-1">
+          Upload PAN Card (Max: 2MB, Format: PNG, JPG, PDF)
+        </label>
+        <input
+          type="file"
+          accept="image/png, image/jpeg, application/pdf"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file && file.size <= 2 * 1024 * 1024) {
+              setPanFile(file);
+            } else {
+              alert("File size must be under 2MB.");
+            }
+          }}
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
         </div>
 
         {/* Aadhaar */}
@@ -265,30 +268,25 @@ const PersonalDetails = ({ formData, setFormData, nextStep }) => {
       </div>
 
       {/* Row 4: Aadhaar Uploads */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Upload Aadhaar Front
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setAadhaarFront(e.target.files[0])}
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Upload Aadhaar Back
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setAadhaarBack(e.target.files[0])}
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Upload Aadhaar Front (Max: 2MB, Format: PNG, JPG, PDF)
+        </label>
+        <input
+          type="file"
+          accept="image/png, image/jpeg, application/pdf"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file && file.size <= 2 * 1024 * 1024) {
+              setAadhaarFront(file);
+            } else {
+              alert("File size must be under 2MB.");
+            }
+          }}
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
+
 
       {/* Next Button */}
       <div className="flex justify-end">
