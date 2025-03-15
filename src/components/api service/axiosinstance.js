@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { logMsgToConsole, logOutUser } from '../utility/constants';
+import { logMsgToConsole, logOutUser } from './constants';
 
 export default function axiosInstance(history = null) {
     const baseURL = `http://test.sabbpe.com/api/v1/auth/`;
