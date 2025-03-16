@@ -21,17 +21,72 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
     return true;
   };
 
-  const validateGST = (gst) => {
+  // Validation functions
+  const validateGSTFormat = (gst) => {
     const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
-    if (!gst || !gstRegex.test(gst)) {
+    return gst && gstRegex.test(gst);
+  };
+
+  const verifyGSTWithAPI = async (gst) => {
+    try {
+      const token = localStorage.getItem("authToken"); // Get token from localStorage
+      if (!token) {
+        setGstStatus({ type: "danger", message: "Authentication token not found" });
+        return false;
+      }
+  
+      const formDataToSend = new FormData();
+      formDataToSend.append("gst_number", gst);
+  
+      const response = await fetch("https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/zoop/getgstverify", {
+        method: "POST",
+        body: formDataToSend,
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok && result.code === 100) {
+        setGstStatus({ type: "success", message: result.response_message || "GST Verified ✅" });
+        setFormData((prev) => ({ ...prev, gstVerified: true }));
+        return true;
+      } else {
+        setGstStatus({ 
+          type: "danger", 
+          message: result.response_message || "GST verification failed" 
+        });
+        setFormData((prev) => ({ ...prev, gstVerified: false }));
+        return false;
+      }
+    } catch (error) {
+      setGstStatus({ 
+        type: "danger", 
+        message: "Error verifying GST. Please try again." 
+      });
+      setFormData((prev) => ({ ...prev, gstVerified: false }));
+      return false;
+    }
+  };
+
+  const validateGST = async (gst) => {
+    if (!validateGSTFormat(gst)) {
       setGstStatus({ type: "danger", message: "Invalid GST format." });
       setFormData((prev) => ({ ...prev, gstVerified: false }));
       return false;
     }
-    setGstStatus({ type: "success", message: "GST Verified ✅" });
-    setFormData((prev) => ({ ...prev, gstVerified: true }));
-    return true;
+
+    return await verifyGSTWithAPI(gst);
   };
+  // const validateGST = (gst) => {
+  //   const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+  //   if (!gst || !gstRegex.test(gst)) {
+  //     setGstStatus({ type: "danger", message: "Invalid GST format." });
+  //     setFormData((prev) => ({ ...prev, gstVerified: false }));
+  //     return false;
+  //   }
+  //   setGstStatus({ type: "success", message: "GST Verified ✅" });
+  //   setFormData((prev) => ({ ...prev, gstVerified: true }));
+  //   return true;
+  // };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -190,9 +245,8 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
             <button
               onClick={() => validateFirmPAN(formData.firmPanNumber)}
               disabled={formData.firmPanVerified}
-              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${
-                formData.firmPanVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
-              }`}
+              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${formData.firmPanVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
+                }`}
             >
               Verify
             </button>
@@ -240,9 +294,8 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
             <button
               onClick={() => validateGST(formData.gstNumber)}
               disabled={formData.gstVerified}
-              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${
-                formData.gstVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
-              }`}
+              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${formData.gstVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
+                }`}
             >
               Verify
             </button>

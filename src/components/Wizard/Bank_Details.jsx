@@ -23,14 +23,39 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
 
   const verifyBankDetails = async () => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const token = localStorage.getItem("authToken"); // Get token from localStorage
+      if (!token) {
+        setVerificationStatus("⚠️ Authentication token not found");
+        setFormData((prev) => ({ ...prev, bankVerified: false }));
+        return;
+      }
+
+      // Basic format validation
       const isValidAccount = /^[0-9]{9,18}$/.test(formData.accountNumber);
       const isValidIFSC = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc);
-      if (isValidAccount && isValidIFSC && formData.accountNumber === formData.confirmAccountNumber) {
-        setVerificationStatus("✅ Successfully Verified");
+      if (!isValidAccount || !isValidIFSC || formData.accountNumber !== formData.confirmAccountNumber) {
+        setVerificationStatus("❌ Invalid Account Number, IFSC Code, or Confirmation Mismatch");
+        setFormData((prev) => ({ ...prev, bankVerified: false }));
+        return;
+      }
+
+      // Prepare FormData for API request
+      const formDataToSend = new FormData();
+      formDataToSend.append("account_no", formData.accountNumber);
+      formDataToSend.append("ifsc_code", formData.ifsc);
+
+      const response = await fetch("https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/zoop/bankaccountverify", {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.code === 100) {
+        setVerificationStatus("✅ " + (result.response_message || "Bank Account Verified"));
         setFormData((prev) => ({ ...prev, bankVerified: true }));
       } else {
-        setVerificationStatus("❌ Invalid Account Number, IFSC Code, or Confirmation Mismatch");
+        setVerificationStatus("❌ " + (result.response_message || "Bank verification failed"));
         setFormData((prev) => ({ ...prev, bankVerified: false }));
       }
     } catch (error) {
@@ -39,6 +64,24 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
       setFormData((prev) => ({ ...prev, bankVerified: false }));
     }
   };
+  // const verifyBankDetails = async () => {
+  //   try {
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
+  //     const isValidAccount = /^[0-9]{9,18}$/.test(formData.accountNumber);
+  //     const isValidIFSC = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc);
+  //     if (isValidAccount && isValidIFSC && formData.accountNumber === formData.confirmAccountNumber) {
+  //       setVerificationStatus("✅ Successfully Verified");
+  //       setFormData((prev) => ({ ...prev, bankVerified: true }));
+  //     } else {
+  //       setVerificationStatus("❌ Invalid Account Number, IFSC Code, or Confirmation Mismatch");
+  //       setFormData((prev) => ({ ...prev, bankVerified: false }));
+  //     }
+  //   } catch (error) {
+  //     console.error("Verification Error:", error);
+  //     setVerificationStatus("⚠️ Error verifying bank details. Try again.");
+  //     setFormData((prev) => ({ ...prev, bankVerified: false }));
+  //   }
+  // };
 
   useEffect(() => {
     const requiredFields = {
@@ -109,11 +152,10 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
             name="confirmAccountNumber"
             value={formData.confirmAccountNumber}
             onChange={handleChange}
-            className={`w-full p-4 text-base border rounded-lg shadow-sm focus:ring-2 transition-all duration-300 hover:shadow-md ${
-              formData.confirmAccountNumber && formData.confirmAccountNumber !== formData.accountNumber
+            className={`w-full p-4 text-base border rounded-lg shadow-sm focus:ring-2 transition-all duration-300 hover:shadow-md ${formData.confirmAccountNumber && formData.confirmAccountNumber !== formData.accountNumber
                 ? "border-red-500 focus:ring-red-500"
                 : "border-gray-200 focus:ring-indigo-400 focus:border-indigo-500"
-            }`}
+              }`}
             placeholder="Re-enter account number"
           />
           {formData.confirmAccountNumber && formData.confirmAccountNumber !== formData.accountNumber && (
