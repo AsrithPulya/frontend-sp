@@ -7,17 +7,78 @@ const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
   const panFileInputRef = useRef(null);
   const aadhaarFileInputRef = useRef(null);
 
-  const validatePAN = (pan) => {
+  const validatePANFormat = (pan) => {
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-    if (!panRegex.test(pan)) {
+    return panRegex.test(pan);
+  };
+
+  const verifyPanWithAPI = async (pan, fullName) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        setPanStatus({ type: "danger", message: "Authentication token not found" });
+        return false;
+      }
+
+      const formDataToSend = new FormData();
+      formDataToSend.append("pan_number", pan);
+      formDataToSend.append("pan_name", fullName);
+
+      const response = await fetch("https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/zoop/getpanverify", {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      const result = await response.json();
+
+      if (response.ok || result.success) {
+        setPanStatus({ type: "success", message: "PAN Verified Successfully ✅" });
+        setFormData((prev) => ({ ...prev, panVerified: true }));
+        return true;
+      } else {
+        setPanStatus({
+          type: "danger",
+          message: result.message || "PAN verification failed"
+        });
+        setFormData((prev) => ({ ...prev, panVerified: false }));
+        return false;
+      }
+    } catch (error) {
+      setPanStatus({
+        type: "danger",
+        message: "Error verifying PAN. Please try again."
+      });
+      setFormData((prev) => ({ ...prev, panVerified: false }));
+      return false;
+    }
+  };
+
+  const validatePAN = async (pan) => {
+    if (!validatePANFormat(pan)) {
       setPanStatus({ type: "danger", message: "Invalid PAN format." });
       setFormData((prev) => ({ ...prev, panVerified: false }));
       return false;
     }
-    setPanStatus({ type: "success", message: "PAN Verified ✅" });
-    setFormData((prev) => ({ ...prev, panVerified: true }));
-    return true;
+
+    if (!formData.fullName) {
+      setPanStatus({ type: "danger", message: "Please enter your full name first" });
+      setFormData((prev) => ({ ...prev, panVerified: false }));
+      return false;
+    }
+
+    return await verifyPanWithAPI(pan, formData.fullName);
   };
+  // const validatePAN = (pan) => {
+  //   const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+  //   if (!panRegex.test(pan)) {
+  //     setPanStatus({ type: "danger", message: "Invalid PAN format." });
+  //     setFormData((prev) => ({ ...prev, panVerified: false }));
+  //     return false;
+  //   }
+  //   setPanStatus({ type: "success", message: "PAN Verified ✅" });
+  //   setFormData((prev) => ({ ...prev, panVerified: true }));
+  //   return true;
+  // };
 
   const validateAadhaar = (aadhaar) => {
     const aadhaarRegex = /^\d{12}$/;
@@ -189,10 +250,11 @@ const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
             />
             <button
               onClick={() => validatePAN(formData.pan)}
-              disabled={formData.panVerified}
-              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${
-                formData.panVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
-              }`}
+              disabled={formData.panVerified || !formData.fullName}
+              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${formData.panVerified || !formData.fullName
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:from-indigo-600 hover:to-blue-600"
+                }`}
             >
               Verify
             </button>
@@ -240,11 +302,10 @@ const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
             <button
               onClick={() => validateAadhaar(formData.aadhaar)}
               disabled={!formData.aadhaarConsent || formData.aadhaarVerified}
-              className={`px-4 py-4 text-base rounded-r-lg transition-all duration-300 ${
-                formData.aadhaarConsent && !formData.aadhaarVerified
+              className={`px-4 py-4 text-base rounded-r-lg transition-all duration-300 ${formData.aadhaarConsent && !formData.aadhaarVerified
                   ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white hover:from-indigo-600 hover:to-blue-600"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+                }`}
             >
               Verify
             </button>

@@ -69,32 +69,41 @@ const Login = () => {
     if (!otp) {
       return setError("Please enter the OTP.");
     }
-  
+
     try {
       // Prepare the form-data payload
       const formData = new FormData();
       formData.append("uname", contact); // Email used for sending OTP
       formData.append("otp", otp);       // OTP entered by user
-  
+
       // Log FormData entries for debugging
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
       }
-  
+
       // Make the API call using axios.post with CORS proxy
       const response = await axios.post(
         "https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/auth/verifyotp",
         formData
       );
-  
+
       // Check if the request was successful
       if (!response.data || response.status !== 200) {
         throw new Error(`OTP verification failed: ${response.status} - ${response.statusText}`);
       }
-  
+
+
       // Log the response for debugging
       console.log("API Response (Verify OTP):", response.data);
-  
+      // Save the token to localStorage (adjust the key based on your API response)
+      const token = response.data.token; // Replace 'token' with the actual field name from your API
+      if (token) {
+        localStorage.setItem("authToken", token); // Store the token with a key like "authToken"
+        console.log("Token saved to localStorage:", token);
+      } else {
+        console.warn("No token found in response:", response.data);
+      }
+
       // On success, navigate to dashboard
       alert("Login Successful!");
       navigate("/dashboard");
