@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo.jpeg";
 import background from "../assets/background.jpg";
-
 import axios from "axios"; // Import axios
 
 const Login = () => {
@@ -109,64 +108,81 @@ const Login = () => {
     }
   };
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: `url(${background})`, backgroundSize: "cover", backgroundPosition: "center" }}>
-  <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md relative">
-    {/* Logo placed correctly inside the card */}
-    <img src={logo} alt="Company Logo" className="absolute top-2 left-8 w-20 h-20" />
+    <div
+      className="min-h-screen flex items-center justify-center relative"
+      style={{
+        background: `url(${background})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-black opacity-40"></div>
 
-    <div className="flex flex-col items-center mb-6">
-      <h2 className="text-2xl font-bold text-gray-800">Login</h2>
+      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md z-10 relative">
+        {/* Logo centered above the form */}
+        <div className="flex justify-center mb-6">
+          <img src={logo} alt="Company Logo" className="w-24 h-24 object-contain" />
+        </div>
+
+        <div className="flex flex-col items-center mb-6">
+          <h2 className="text-3xl font-bold text-gray-900">Login</h2>
+          <p className="text-sm text-gray-600 mt-1">Please enter your credentials</p>
+        </div>
+
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+
+        <div className="space-y-6">
+          <div>
+            <label htmlFor="contact" className="block text-sm font-medium text-gray-700">
+              Email or Mobile Number
+            </label>
+            <input
+              type="text"
+              id="contact"
+              placeholder="Enter Email or Mobile Number"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-200"
+            />
+          </div>
+
+          {otpSent && (
+            <div>
+              <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
+                OTP
+              </label>
+              <input
+                type="text"
+                id="otp"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-200"
+              />
+            </div>
+          )}
+
+          <button
+            onClick={otpSent ? handleOtpLogin : handleSendOtp}
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 rounded-md hover:from-blue-700 hover:to-blue-800 transition duration-200 font-semibold shadow-md"
+          >
+            {otpSent ? "Verify OTP & Login" : "Send OTP"}
+          </button>
+
+          <p className="text-sm text-center text-gray-600 mt-4">
+            Don't have an account?{" "}
+            <button
+              onClick={() => navigate("/User-Registration")}
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Register
+            </button>
+          </p>
+        </div>
+      </div>
     </div>
-
-    {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-
-    <input
-      type="text"
-      placeholder="Enter Email or Mobile Number"
-      value={contact}
-      onChange={(e) => setContact(e.target.value)}
-      className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-    
-    {otpSent ? (
-      <>
-        <input
-          type="text"
-          placeholder="Enter OTP"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          className="w-full p-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          onClick={handleOtpLogin}
-          className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200"
-        >
-          Verify OTP & Login
-        </button>
-      </>
-    ) : (
-      <button
-        onClick={handleSendOtp}
-        className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200"
-      >
-        Send OTP
-      </button>
-    )}
-
-    <p className="text-sm text-center mt-4">
-      Don't have an account?{" "}
-      <button
-        onClick={() => navigate("/User-Registration")}
-        className="text-blue-500 hover:underline"
-      >
-        Register
-      </button>
-    </p>
-  </div>
-</div>
-
   );
 };
 
