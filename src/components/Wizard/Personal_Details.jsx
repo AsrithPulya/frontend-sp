@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from "react";
+import { toast } from "react-toastify"; // Import toast
+
 
 const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
   const [panStatus, setPanStatus] = React.useState(formData.panStatus || null);
@@ -43,6 +45,15 @@ const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
         setFormData((prev) => ({ ...prev, panVerified: false }));
         return false;
       }
+      toast.success("Pan Verified!!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
     } catch (error) {
       setPanStatus({
         type: "danger",
@@ -252,8 +263,8 @@ const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
               onClick={() => validatePAN(formData.pan)}
               disabled={formData.panVerified || !formData.fullName}
               className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${formData.panVerified || !formData.fullName
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:from-indigo-600 hover:to-blue-600"
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:from-indigo-600 hover:to-blue-600"
                 }`}
             >
               Verify
@@ -303,8 +314,8 @@ const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
               onClick={() => validateAadhaar(formData.aadhaar)}
               disabled={!formData.aadhaarConsent || formData.aadhaarVerified}
               className={`px-4 py-4 text-base rounded-r-lg transition-all duration-300 ${formData.aadhaarConsent && !formData.aadhaarVerified
-                  ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white hover:from-indigo-600 hover:to-blue-600"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white hover:from-indigo-600 hover:to-blue-600"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
             >
               Verify

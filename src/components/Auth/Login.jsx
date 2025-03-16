@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo.jpeg";
 import background from "../assets/background.jpg";
 import axios from "axios"; // Import axios
+import { toast } from "react-toastify"; // Import toast
 
 const Login = () => {
   const [contact, setContact] = useState("");
@@ -19,48 +20,83 @@ const Login = () => {
   const handleSendOtp = async () => {
     // Validate input
     if (!isValidEmail(contact) && !isValidPhone(contact)) {
-      return setError("Enter a valid email or mobile number.");
+      setError("Enter a valid email or mobile number.");
+      toast.error("Invalid email or mobile number!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
     }
-
+  
     const isEmail = isValidEmail(contact);
     if (!isEmail) {
       setError("This API only supports email-based OTP for now.");
+      toast.warn("Only email-based OTP is supported!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return;
     }
-
+  
     try {
       // Prepare the form-data payload
       const formData = new FormData();
       formData.append("uname", contact); // Email or mobile number
       formData.append("usertype", "Distributor");
-      formData.append("ltype", "email"); // Corrected from "ltype" to "type"
-
+      formData.append("ltype", "email");
+  
       // Log FormData entries for debugging
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
       }
-
+  
       // Make the API call using axios.post with CORS proxy, no headers
       const response = await axios.post(
         "https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/auth/sendemailotp",
         formData
       );
-
+  
       // Check if the request was successful
       if (!response.data || response.status !== 200) {
         throw new Error("Failed to send OTP. Please try again.");
       }
-
+  
       // Log the response for debugging
       console.log("API Response:", response.data);
-
+  
       // On success, update the UI
       setOtpSent(true);
       setError("");
-      alert("OTP Sent Successfully");
+      toast.success("OTP Sent Successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } catch (err) {
       console.error("Network Error:", err);
-      setError(err.message || "Something went wrong. Please try again.");
+      const errorMessage = err.message || "Something went wrong. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
@@ -105,7 +141,15 @@ const Login = () => {
       }
 
       // On success, navigate to dashboard
-      alert("Login Successful!");
+      toast.success("Login Successful", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
       navigate("/dashboard");
     } catch (err) {
       console.error("Error Details (Verify OTP):", {
