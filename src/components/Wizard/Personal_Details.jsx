@@ -1,343 +1,294 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
-const PersonalDetails = ({ formData, setFormData, nextStep }) => {
-  const [panStatus, setPanStatus] = useState(null);
-  const [aadhaarStatus, setAadhaarStatus] = useState(null);
-  const [aadhaarConsent, setAadhaarConsent] = useState(false);
-  const [nextEnabled, setNextEnabled] = useState(false);
-  const [panFile, setPanFile] = useState(null);
-  const [aadhaarFront, setAadhaarFront] = useState(null);
-  
-  const [showConfirmation, setShowConfirmation] = useState(false);
+const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
+  const [panStatus, setPanStatus] = React.useState(formData.panStatus || null);
+  const [aadhaarStatus, setAadhaarStatus] = React.useState(formData.aadhaarStatus || null);
+
+  const panFileInputRef = useRef(null);
+  const aadhaarFileInputRef = useRef(null);
+
+  const validatePAN = (pan) => {
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (!panRegex.test(pan)) {
+      setPanStatus({ type: "danger", message: "Invalid PAN format." });
+      setFormData((prev) => ({ ...prev, panVerified: false }));
+      return false;
+    }
+    setPanStatus({ type: "success", message: "PAN Verified ✅" });
+    setFormData((prev) => ({ ...prev, panVerified: true }));
+    return true;
+  };
+
+  const validateAadhaar = (aadhaar) => {
+    const aadhaarRegex = /^\d{12}$/;
+    if (!aadhaarRegex.test(aadhaar)) {
+      setAadhaarStatus({ type: "danger", message: "Enter a valid 12-digit Aadhaar number" });
+      setFormData((prev) => ({ ...prev, aadhaarVerified: false }));
+      return false;
+    }
+    if (!formData.aadhaarConsent) {
+      setAadhaarStatus({ type: "danger", message: "Please provide consent to validate Aadhaar" });
+      setFormData((prev) => ({ ...prev, aadhaarVerified: false }));
+      return false;
+    }
+    setAadhaarStatus({ type: "success", message: "Aadhaar Verified ✅" });
+    setFormData((prev) => ({ ...prev, aadhaarVerified: true }));
+    return true;
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+      ...(name === "pan" && { panVerified: false, panStatus: null }),
+      ...(name === "aadhaar" && { aadhaarVerified: false, aadhaarStatus: null }),
+    }));
+
+    if (name === "pan") validatePAN(value);
+    if (name === "aadhaar") validateAadhaar(value);
+  };
+
+  const handleFileChange = (fieldName) => (e) => {
+    const file = e.target.files[0];
+    if (file && file.size <= 2 * 1024 * 1024) {
+      setFormData((prev) => ({ ...prev, [fieldName]: file }));
+    } else {
+      alert("File size must be under 2MB.");
+    }
+  };
 
   useEffect(() => {
-  const requiredFields = [
+    const requiredFields = {
+      fullName: formData.fullName,
+      mobile: formData.mobile,
+      email: formData.email,
+      dob: formData.dob,
+      address1: formData.address1,
+      address2: formData.address2,
+      pan: formData.pan,
+      aadhaar: formData.aadhaar,
+      panFile: formData.panFile,
+      aadhaarFront: formData.aadhaarFront,
+    };
+
+    const isFieldValid = (field) => {
+      if (typeof field === "string") return field.trim() !== "";
+      return field !== null;
+    };
+
+    const allFieldsFilled =
+      Object.values(requiredFields).every(isFieldValid) &&
+      formData.panVerified &&
+      formData.aadhaarVerified &&
+      formData.aadhaarConsent;
+
+    setStepComplete(allFieldsFilled);
+  }, [
     formData.fullName,
     formData.mobile,
     formData.email,
     formData.dob,
-    formData.address,
+    formData.address1,
+    formData.address2,
     formData.pan,
-    formData.aadhaar
-  ];
-  const allFieldsFilled =
-    requiredFields.every(field => field?.trim() !== "") &&
-    panStatus?.type === "success" &&
-    aadhaarStatus?.type === "success" &&
-    aadhaarConsent &&
-    panFile &&
-    aadhaarFront;
-
-  setNextEnabled(allFieldsFilled);
-}, [formData.fullName, formData.mobile, formData.email, formData.dob, formData.address, formData.pan, formData.aadhaar, panStatus, aadhaarStatus, aadhaarConsent, panFile, aadhaarFront]);
-
-  // PAN Validation
-  const validatePAN = () => {
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-    if (!panRegex.test(formData.pan)) {
-      setPanStatus({
-        type: "danger",
-        message: "Invalid PAN format. Please enter a valid PAN.",
-      });
-      return;
-    }
-    setTimeout(() => {
-      setPanStatus({ type: "success", message: "PAN Verified ✅" });
-    }, 1500);
-  };
-
-  // Aadhaar Validation
-  const validateAadhaar = () => {
-    const aadhaarRegex = /^\d{12}$/;
-    if (!aadhaarRegex.test(formData.aadhaar)) {
-      setAadhaarStatus({
-        type: "danger",
-        message: "Enter a valid 12-digit Aadhaar number",
-      });
-      return;
-    }
-    if (!aadhaarConsent) {
-      setAadhaarStatus({
-        type: "danger",
-        message: "Please provide consent to validate Aadhaar",
-      });
-      return;
-    }
-    setTimeout(() => {
-      setAadhaarStatus({ type: "success", message: "Aadhaar Verified ✅" });
-    }, 1500);
-  };
-
-  const handleNext = () => {
-    setShowConfirmation(true);
-  };
-
-  const confirmAndProceed = () => {
-    setShowConfirmation(false);
-    nextStep();
-  };
+    formData.panVerified,
+    formData.aadhaar,
+    formData.aadhaarVerified,
+    formData.aadhaarConsent,
+    formData.panFile,
+    formData.aadhaarFront,
+    setStepComplete,
+  ]);
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-2xl font-semibold text-center text-gray-800 mb-4">
-        Personal Details
-      </h3>
-
-      {/* Row 1: Full Name and Mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-8">
+      <h2 className="text-3xl font-semibold text-gray-800">Personal Info</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Full Name
-          </label>
+          <label className="block text-base font-medium text-gray-700 mb-2">Full Name</label>
           <input
             type="text"
-            placeholder="Enter your full name"
+            name="fullName"
             value={formData.fullName}
-            onChange={(e) =>
-              setFormData({ ...formData, fullName: e.target.value })
-            }
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={handleChange}
+            className="w-full p-4 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300 hover:shadow-md"
+            placeholder="Enter your full name"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Mobile Number
-          </label>
+          <label className="block text-base font-medium text-gray-700 mb-2">Mobile Number</label>
           <input
             type="text"
-            placeholder="+91"
+            name="mobile"
             value={formData.mobile}
-            onChange={(e) =>
-              setFormData({ ...formData, mobile: e.target.value })
-            }
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={handleChange}
+            className="w-full p-4 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300 hover:shadow-md"
+            placeholder="+91"
           />
         </div>
       </div>
-
-      {/* Row 2: Email and DOB */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email
-          </label>
+          <label className="block text-base font-medium text-gray-700 mb-2">Email</label>
           <input
             type="email"
-            placeholder="you@example.com"
+            name="email"
             value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={handleChange}
+            className="w-full p-4 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300 hover:shadow-md"
+            placeholder="you@example.com"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Date of Birth
-          </label>
+          <label className="block text-base font-medium text-gray-700 mb-2">Date of Birth</label>
           <input
             type="date"
+            name="dob"
             value={formData.dob}
-            onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={handleChange}
+            className="w-full p-4 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300 hover:shadow-md"
           />
         </div>
       </div>
-
-      {/* Address */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Address
-        </label>
-        <textarea
-          rows={2}
-          placeholder="Enter your address"
-          value={formData.address}
-          onChange={(e) =>
-            setFormData({ ...formData, address: e.target.value })
-          }
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      {/* Row 3: PAN and Aadhaar */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* PAN */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            PAN Number
-          </label>
+          <label className="block text-base font-medium text-gray-700 mb-2">Address Line 1</label>
+          <input
+            type="text"
+            name="address1"
+            value={formData.address1}
+            onChange={handleChange}
+            className="w-full p-4 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300 hover:shadow-md"
+            placeholder="Street address"
+          />
+        </div>
+        <div>
+          <label className="block text-base font-medium text-gray-700 mb-2">Address Line 2</label>
+          <input
+            type="text"
+            name="address2"
+            value={formData.address2}
+            onChange={handleChange}
+            className="w-full p-4 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300 hover:shadow-md"
+            placeholder="Apartment, suite, etc."
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <label className="block text-base font-medium text-gray-700 mb-1">PAN Number</label>
           <div className="flex">
             <input
               type="text"
-              placeholder="ABCDE1234F"
+              name="pan"
               value={formData.pan}
-              onChange={(e) =>
-                setFormData({ ...formData, pan: e.target.value })
-              }
-              className="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={handleChange}
+              className="flex-1 p-4 text-base border border-gray-200 rounded-l-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300 hover:shadow-md"
+              placeholder="ABCDE1234F"
             />
             <button
-              onClick={validatePAN}
-              className="px-4 py-2 bg-transparent border border-blue-500 text-blue-500 rounded-r-md hover:bg-blue-50 transition duration-200"
+              onClick={() => validatePAN(formData.pan)}
+              disabled={formData.panVerified}
+              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${
+                formData.panVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
+              }`}
             >
-              Verify PAN
+              Verify
             </button>
           </div>
           {panStatus && (
-            <div
-              className={`mt-2 p-2 rounded-md text-sm ${
-                panStatus.type === "success"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
+            <p className={`mt-2 text-base ${panStatus.type === "success" ? "text-green-600" : "text-red-600"}`}>
               {panStatus.message}
-            </div>
+            </p>
           )}
-          <div>
-        <label className="block text-sm font-medium text-gray-700 mt-4 mb-1">
-          Upload PAN Card (Max: 2MB, Format: PNG, JPG, PDF)
-        </label>
-        <input
-          type="file"
-          accept="image/png, image/jpeg, application/pdf"
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (file && file.size <= 2 * 1024 * 1024) {
-              setPanFile(file);
-            } else {
-              alert("File size must be under 2MB.");
-            }
-          }}
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+          <div className="mt-4">
+            <label className="block text-base font-medium text-gray-700 mb-1">Upload PAN Card</label>
+            <p className="text-sm text-gray-500 mb-2">Accepted formats: PNG, JPEG, PDF | Max size: 2MB</p>
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={() => panFileInputRef.current.click()}
+                className="px-4 py-2 text-base bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-300"
+              >
+                Browse...
+              </button>
+              <span className="text-base text-gray-500">
+                {formData.panFile ? formData.panFile.name : "No file selected"}
+              </span>
+              <input
+                type="file"
+                accept="image/png, image/jpeg, application/pdf"
+                ref={panFileInputRef}
+                onChange={handleFileChange("panFile")}
+                className="hidden"
+              />
+            </div>
+          </div>
         </div>
-
-        {/* Aadhaar */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Aadhaar Number
-          </label>
+          <label className="block text-base font-medium text-gray-700 mb-1">Aadhaar Number</label>
           <div className="flex">
             <input
               type="text"
-              placeholder="XXXX XXXX XXXX"
+              name="aadhaar"
               value={formData.aadhaar}
-              onChange={(e) =>
-                setFormData({ ...formData, aadhaar: e.target.value })
-              }
-              className="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={handleChange}
+              className="flex-1 p-4 text-base border border-gray-200 rounded-l-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300 hover:shadow-md"
+              placeholder="XXXX XXXX XXXX"
             />
             <button
-              onClick={validateAadhaar}
-              disabled={!aadhaarConsent}
-              className={`px-4 py-2 bg-transparent border border-blue-500 text-blue-500 rounded-r-md transition duration-200 ${
-                aadhaarConsent
-                  ? "hover:bg-blue-50"
-                  : "opacity-50 cursor-not-allowed"
+              onClick={() => validateAadhaar(formData.aadhaar)}
+              disabled={!formData.aadhaarConsent || formData.aadhaarVerified}
+              className={`px-4 py-4 text-base rounded-r-lg transition-all duration-300 ${
+                formData.aadhaarConsent && !formData.aadhaarVerified
+                  ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white hover:from-indigo-600 hover:to-blue-600"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
-              Validate Aadhaar
+              Verify
             </button>
           </div>
           {aadhaarStatus && (
-            <div
-              className={`mt-2 p-2 rounded-md text-sm ${
-                aadhaarStatus.type === "success"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
+            <p className={`mt-2 text-base ${aadhaarStatus.type === "success" ? "text-green-600" : "text-red-600"}`}>
               {aadhaarStatus.message}
-            </div>
+            </p>
           )}
-          <label className="flex items-center mt-2">
+          <label className="flex items-center mt-3">
             <input
               type="checkbox"
-              checked={aadhaarConsent}
-              onChange={(e) => setAadhaarConsent(e.target.checked)}
-              className="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+              name="aadhaarConsent"
+              checked={formData.aadhaarConsent}
+              onChange={handleChange}
+              className="mr-2 h-5 w-5 text-indigo-500 border-gray-300 rounded focus:ring-indigo-400"
             />
-            <span className="text-sm text-gray-700">
-              I give consent to validate my Aadhaar
-            </span>
+            <span className="text-base text-gray-600">I give consent to validate my Aadhaar</span>
           </label>
-        </div>
-      </div>
-
-      {/* Row 4: Aadhaar Uploads */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Upload Aadhaar Front (Max: 2MB, Format: PNG, JPG, PDF)
-        </label>
-        <input
-          type="file"
-          accept="image/png, image/jpeg, application/pdf"
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (file && file.size <= 2 * 1024 * 1024) {
-              setAadhaarFront(file);
-            } else {
-              alert("File size must be under 2MB.");
-            }
-          }}
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-
-      {/* Next Button */}
-      <div className="flex justify-end">
-        <button
-          onClick={handleNext}
-          disabled={!nextEnabled}
-          className={`px-6 py-2 bg-blue-500 text-white font-semibold rounded-md transition duration-200 ${
-            nextEnabled
-              ? "hover:bg-blue-600"
-              : "opacity-50 cursor-not-allowed"
-          }`}
-        >
-          Next →
-        </button>
-      </div>
-
-      {/* Confirmation Modal */}
-      {showConfirmation && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="text-lg font-semibold text-gray-800">
-                Confirm Your Details
-              </h4>
+          <div className="mt-4">
+            <label className="block text-base font-medium text-gray-700 mb-1">Upload Aadhaar Front</label>
+            <p className="text-sm text-gray-500 mb-2">Accepted formats: PNG, JPEG, PDF | Max size: 2MB</p>
+            <div className="flex items-center space-x-3">
               <button
-                onClick={() => setShowConfirmation(false)}
-                className="text-gray-500 hover:text-gray-700"
+                type="button"
+                onClick={() => aadhaarFileInputRef.current.click()}
+                className="px-4 py-2 text-base bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-300"
               >
-                ✕
+                Browse...
               </button>
-            </div>
-            <p className="text-gray-700 mb-6">
-              Are you sure all the details entered are correct?
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowConfirmation(false)}
-                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmAndProceed}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
-              >
-                Confirm & Next
-              </button>
+              <span className="text-base text-gray-500">
+                {formData.aadhaarFront ? formData.aadhaarFront.name : "No file selected"}
+              </span>
+              <input
+                type="file"
+                accept="image/png, image/jpeg, application/pdf"
+                ref={aadhaarFileInputRef}
+                onChange={handleFileChange("aadhaarFront")}
+                className="hidden"
+              />
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
