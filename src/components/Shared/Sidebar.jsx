@@ -1,13 +1,18 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { FaTachometerAlt, FaUserPlus, FaUser, FaBox, FaExchangeAlt, FaCog, FaQuestionCircle } from "react-icons/fa"; // Import icons
+import { useNavigate, useLocation } from "react-router-dom";
+import { FaTachometerAlt, FaUserPlus, FaUser, FaBox, FaExchangeAlt, FaCog, FaQuestionCircle } from "react-icons/fa";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Determine the active route based on the current path
-  const currentPath = window.location.pathname;
-  const isActive = (path) => currentPath === path;
+  const isActive = (path) => location.pathname === path;
+
+  const handleNavigation = (path) => {
+    console.log(`Attempting to navigate to: ${path}`);
+    console.log(`Current location: ${location.pathname}`);
+    navigate(path);
+  };
 
   return (
     <aside
@@ -19,25 +24,25 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div className="border-t border-gray-600 my-4"></div>
       <nav className="space-y-4">
         <button
-          onClick={() => navigate("/dashboard")}
+          onClick={() => handleNavigation("/Dashboard")}
           className={`w-full flex items-center space-x-4 p-3 text-lg font-medium text-gray-200 rounded-lg transition duration-300 ${
-            isActive("/dashboard") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
+            isActive("/Dashboard") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
           }`}
         >
-          <FaTachometerAlt className={`text-2xl ${isActive("/dashboard") ? "text-white" : "hover:text-indigo-300"}`} />
+          <FaTachometerAlt className={`text-2xl ${isActive("/Dashboard") ? "text-white" : "hover:text-indigo-300"}`} />
           <span>Dashboard</span>
         </button>
         <button
-          onClick={() => navigate("/profile")}
+          onClick={() => handleNavigation("/Profile")}
           className={`w-full flex items-center space-x-4 p-3 text-lg font-medium text-gray-200 rounded-lg transition duration-300 ${
-            isActive("/profile") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
+            isActive("/Profile") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
           }`}
         >
-          <FaUser className={`text-2xl ${isActive("/profile") ? "text-white" : "hover:text-indigo-300"}`} />
+          <FaUser className={`text-2xl ${isActive("/Profile") ? "text-white" : "hover:text-indigo-300"}`} />
           <span>OnBoarding</span>
         </button>
         <button
-          onClick={() => navigate("/create-user")}
+          onClick={() => handleNavigation("/create-user")}
           className={`w-full flex items-center space-x-4 p-3 text-lg font-medium text-gray-200 rounded-lg transition duration-300 ${
             isActive("/create-user") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
           }`}
@@ -46,16 +51,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <span>Create User</span>
         </button>
         <button
-          onClick={() => navigate("/products")}
+          onClick={() => handleNavigation("/Products")}
           className={`w-full flex items-center space-x-4 p-3 text-lg font-medium text-gray-200 rounded-lg transition duration-300 ${
-            isActive("/products") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
+            isActive("/Products") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
           }`}
         >
-          <FaBox className={`text-2xl ${isActive("/products") ? "text-white" : "hover:text-indigo-300"}`} />
+          <FaBox className={`text-2xl ${isActive("/Products") ? "text-white" : "hover:text-indigo-300"}`} />
           <span>Products</span>
         </button>
         <button
-          onClick={() => navigate("/transactions")}
+          onClick={() => handleNavigation("/transactions")}
           className={`w-full flex items-center space-x-4 p-3 text-lg font-medium text-gray-200 rounded-lg transition duration-300 ${
             isActive("/transactions") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
           }`}
@@ -64,7 +69,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <span>Transactions</span>
         </button>
         <button
-          onClick={() => navigate("/settings")}
+          onClick={() => handleNavigation("/settings")}
           className={`w-full flex items-center space-x-4 p-3 text-lg font-medium text-gray-200 rounded-lg transition duration-300 ${
             isActive("/settings") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
           }`}
@@ -73,7 +78,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <span>Settings</span>
         </button>
         <button
-          onClick={() => navigate("/help")}
+          onClick={() => handleNavigation("/help")}
           className={`w-full flex items-center space-x-4 p-3 text-lg font-medium text-gray-200 rounded-lg transition duration-300 ${
             isActive("/help") ? "bg-[#2A4066] text-white" : "hover:bg-gradient-to-r from-[#2A4066] to-[#3A5A80]"
           }`}
