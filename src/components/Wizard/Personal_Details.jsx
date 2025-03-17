@@ -3,6 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
   const [panStatus, setPanStatus] = useState(formData.panStatus || null);
   const [aadhaarStatus, setAadhaarStatus] = useState(formData.aadhaarStatus || null);
+  const [uploadedDocs, setUploadedDocs] = useState(() => {
+    // Initialize from localStorage if available
+    const savedDocs = localStorage.getItem('uploadedDocs');
+    return savedDocs ? JSON.parse(savedDocs) : {};
+  });
   const prevCompleteRef = useRef(false); // Track previous completion status
 
   const panFileInputRef = useRef(null);
@@ -50,12 +55,66 @@ const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
     if (name === "aadhaar") validateAadhaar(value);
   };
 
-  const handleFileChange = (fieldName) => (e) => {
+  const handleFileChange = (fieldName) => async (e) => {
     const file = e.target.files[0];
+    
     if (file && file.size <= 2 * 1024 * 1024) {
+      // Update formData with the selected file
       setFormData((prev) => ({ ...prev, [fieldName]: file }));
+      
+      // Prepare form data for API
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+
+      try {
+        const response = await fetch('https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/docs/api/docupload', {
+          method: 'POST',
+          body: uploadData,
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+          // Store the uploaded file URL with document type
+          setUploadedDocs((prev) => {
+            const newDocs = {
+              ...prev,
+              [fieldName]: result.file_url
+            };
+            // Save to localStorage
+            localStorage.setItem('uploadedDocs', JSON.stringify(newDocs));
+            return newDocs;
+          });
+        } else {
+          alert(result.message || 'File upload failed');
+          // Clear the file input if upload fails
+          setFormData((prev) => ({ ...prev, [fieldName]: null }));
+          if (fieldName === 'panFile' && panFileInputRef.current) {
+            panFileInputRef.current.value = '';
+          }
+          if (fieldName === 'aadhaarFront' && aadhaarFileInputRef.current) {
+            aadhaarFileInputRef.current.value = '';
+          }
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert('An error occurred while uploading the file');
+        setFormData((prev) => ({ ...prev, [fieldName]: null }));
+        if (fieldName === 'panFile' && panFileInputRef.current) {
+          panFileInputRef.current.value = '';
+        }
+        if (fieldName === 'aadhaarFront' && aadhaarFileInputRef.current) {
+          aadhaarFileInputRef.current.value = '';
+        }
+      }
     } else {
       alert("File size must be under 2MB.");
+      if (fieldName === 'panFile' && panFileInputRef.current) {
+        panFileInputRef.current.value = '';
+      }
+      if (fieldName === 'aadhaarFront' && aadhaarFileInputRef.current) {
+        aadhaarFileInputRef.current.value = '';
+      }
     }
   };
 
