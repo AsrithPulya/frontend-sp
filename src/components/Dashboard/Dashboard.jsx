@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Shared/Navbar";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-const Dashboard = () => {
+const Dashboard = ({ isSidebarOpen, toggleSidebar }) => {
   const [earningsData, setEarningsData] = useState([]);
 
   useEffect(() => {
@@ -18,7 +18,12 @@ const Dashboard = () => {
   return (
     <div className="flex-1 flex flex-col">
       {/* Navbar is in App.js */}
-      <main className="p-6 md:p-8 ml-80" style={{ marginTop: "64px" }}>
+      <main
+        className={`p-6 md:p-8 transition-all duration-300 ${
+          isSidebarOpen ? "ml-64" : "ml-16"
+        }`} // Adjusted margin to reduce gap
+        style={{ marginTop: "64px" }}
+      >
         <div className="mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Welcome to Your Dashboard</h2>
           <p className="text-gray-600 text-lg">Monitor your business performance and access key features.</p>

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 const SupportingDocuments = ({ formData, setFormData, setStepComplete }) => {
+  const prevCompleteRef = useRef(false); // Track previous completion status
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -34,8 +35,12 @@ const SupportingDocuments = ({ formData, setFormData, setStepComplete }) => {
 
   useEffect(() => {
     const allFieldsFilled = formData.uploadedDocuments.length > 0;
-    setStepComplete(allFieldsFilled);
-  }, [formData.uploadedDocuments, setStepComplete]);
+
+    if (allFieldsFilled !== prevCompleteRef.current) {
+      setStepComplete(allFieldsFilled);
+      prevCompleteRef.current = allFieldsFilled;
+    }
+  }, [formData.uploadedDocuments]);
 
   return (
     <div className="space-y-8">

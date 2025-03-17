@@ -60,7 +60,11 @@ const Products = () => {
       <Navbar toggleSidebar={toggleSidebar} />
       <div className="flex flex-1 min-h-screen">
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        <div className="flex-1 ml-0 md:ml-64 mt-16">
+        <div
+          className={`flex-1 transition-all duration-300 ${
+            isSidebarOpen ? "ml-56" : "ml-16"
+          } mt-16`} // Adjusted ml-64 to ml-56 to move content more to the left
+        >
           <main className="p-6 md:p-8">
             <div className="mb-8">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Available Packages</h2>

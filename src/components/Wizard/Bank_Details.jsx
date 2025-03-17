@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const BankDetails = ({ formData, setFormData, setStepComplete }) => {
-  const [verificationStatus, setVerificationStatus] = React.useState(null);
-  const [uploadStatus, setUploadStatus] = React.useState(null);
+  const [verificationStatus, setVerificationStatus] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState(null);
+  const prevCompleteRef = useRef(false); // Track previous completion status
 
   const bankFileInputRef = useRef(null);
 
@@ -23,14 +24,13 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
 
   const verifyBankDetails = async () => {
     try {
-      const token = localStorage.getItem("authToken"); // Get token from localStorage
+      const token = localStorage.getItem("authToken");
       if (!token) {
         setVerificationStatus("⚠️ Authentication token not found");
         setFormData((prev) => ({ ...prev, bankVerified: false }));
         return;
       }
 
-      // Basic format validation
       const isValidAccount = /^[0-9]{9,18}$/.test(formData.accountNumber);
       const isValidIFSC = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc);
       if (!isValidAccount || !isValidIFSC || formData.accountNumber !== formData.confirmAccountNumber) {
@@ -39,15 +39,17 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
         return;
       }
 
-      // Prepare FormData for API request
       const formDataToSend = new FormData();
       formDataToSend.append("account_no", formData.accountNumber);
       formDataToSend.append("ifsc_code", formData.ifsc);
 
-      const response = await fetch("https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/zoop/bankaccountverify", {
-        method: "POST",
-        body: formDataToSend,
-      });
+      const response = await fetch(
+        "https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/zoop/bankaccountverify",
+        {
+          method: "POST",
+          body: formDataToSend,
+        }
+      );
 
       const result = await response.json();
 
@@ -64,24 +66,6 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
       setFormData((prev) => ({ ...prev, bankVerified: false }));
     }
   };
-  // const verifyBankDetails = async () => {
-  //   try {
-  //     await new Promise((resolve) => setTimeout(resolve, 1000));
-  //     const isValidAccount = /^[0-9]{9,18}$/.test(formData.accountNumber);
-  //     const isValidIFSC = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc);
-  //     if (isValidAccount && isValidIFSC && formData.accountNumber === formData.confirmAccountNumber) {
-  //       setVerificationStatus("✅ Successfully Verified");
-  //       setFormData((prev) => ({ ...prev, bankVerified: true }));
-  //     } else {
-  //       setVerificationStatus("❌ Invalid Account Number, IFSC Code, or Confirmation Mismatch");
-  //       setFormData((prev) => ({ ...prev, bankVerified: false }));
-  //     }
-  //   } catch (error) {
-  //     console.error("Verification Error:", error);
-  //     setVerificationStatus("⚠️ Error verifying bank details. Try again.");
-  //     setFormData((prev) => ({ ...prev, bankVerified: false }));
-  //   }
-  // };
 
   useEffect(() => {
     const requiredFields = {
@@ -102,7 +86,10 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
       formData.accountNumber === formData.confirmAccountNumber &&
       formData.bankVerified;
 
-    setStepComplete(allFieldsFilled);
+    if (allFieldsFilled !== prevCompleteRef.current) {
+      setStepComplete(allFieldsFilled);
+      prevCompleteRef.current = allFieldsFilled;
+    }
   }, [
     formData.bankName,
     formData.accountNumber,
@@ -110,7 +97,6 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
     formData.ifsc,
     formData.bankDocument,
     formData.bankVerified,
-    setStepComplete,
   ]);
 
   return (
@@ -152,10 +138,11 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
             name="confirmAccountNumber"
             value={formData.confirmAccountNumber}
             onChange={handleChange}
-            className={`w-full p-4 text-base border rounded-lg shadow-sm focus:ring-2 transition-all duration-300 hover:shadow-md ${formData.confirmAccountNumber && formData.confirmAccountNumber !== formData.accountNumber
+            className={`w-full p-4 text-base border rounded-lg shadow-sm focus:ring-2 transition-all duration-300 hover:shadow-md ${
+              formData.confirmAccountNumber && formData.confirmAccountNumber !== formData.accountNumber
                 ? "border-red-500 focus:ring-red-500"
                 : "border-gray-200 focus:ring-indigo-400 focus:border-indigo-500"
-              }`}
+            }`}
             placeholder="Re-enter account number"
           />
           {formData.confirmAccountNumber && formData.confirmAccountNumber !== formData.accountNumber && (
@@ -186,7 +173,9 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
         </p>
       )}
       <div>
-        <label className="block text-base font-medium text-gray-700 mb-1">Upload Cancelled Cheque / Bank Statement</label>
+        <label className="block text-base font-medium text-gray-700 mb-1">
+          Upload Cancelled Cheque / Bank Statement
+        </label>
         <p className="text-sm text-gray-500 mb-2">Accepted formats: PNG, JPEG, PDF | Max size: 2MB</p>
         <div className="flex items-center space-x-3">
           <button

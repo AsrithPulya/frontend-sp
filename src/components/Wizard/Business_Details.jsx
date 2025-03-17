@@ -1,14 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
-  const [firmPanStatus, setFirmPanStatus] = React.useState(formData.firmPanStatus || null);
-  const [gstStatus, setGstStatus] = React.useState(formData.gstStatus || null);
+  const [firmPanStatus, setFirmPanStatus] = useState(formData.firmPanStatus || null);
+  const [gstStatus, setGstStatus] = useState(formData.gstStatus || null);
+  const prevCompleteRef = useRef(false); // Track previous completion status
 
   const firmPanFileInputRef = useRef(null);
   const businessRegistrationFileInputRef = useRef(null);
   const addressProofFileInputRef = useRef(null);
 
-  // Validation functions
   const validateFirmPAN = (pan) => {
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     if (!pan || !panRegex.test(pan)) {
@@ -21,7 +21,6 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
     return true;
   };
 
-  // Validation functions
   const validateGSTFormat = (gst) => {
     const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
     return gst && gstRegex.test(gst);
@@ -29,38 +28,41 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
 
   const verifyGSTWithAPI = async (gst) => {
     try {
-      const token = localStorage.getItem("authToken"); // Get token from localStorage
+      const token = localStorage.getItem("authToken");
       if (!token) {
         setGstStatus({ type: "danger", message: "Authentication token not found" });
         return false;
       }
-  
+
       const formDataToSend = new FormData();
       formDataToSend.append("gst_number", gst);
-  
-      const response = await fetch("https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/zoop/getgstverify", {
-        method: "POST",
-        body: formDataToSend,
-      });
-  
+
+      const response = await fetch(
+        "https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/zoop/getgstverify",
+        {
+          method: "POST",
+          body: formDataToSend,
+        }
+      );
+
       const result = await response.json();
-  
+
       if (response.ok && result.code === 100) {
         setGstStatus({ type: "success", message: result.response_message || "GST Verified ✅" });
         setFormData((prev) => ({ ...prev, gstVerified: true }));
         return true;
       } else {
-        setGstStatus({ 
-          type: "danger", 
-          message: result.response_message || "GST verification failed" 
+        setGstStatus({
+          type: "danger",
+          message: result.response_message || "GST verification failed",
         });
         setFormData((prev) => ({ ...prev, gstVerified: false }));
         return false;
       }
     } catch (error) {
-      setGstStatus({ 
-        type: "danger", 
-        message: "Error verifying GST. Please try again." 
+      setGstStatus({
+        type: "danger",
+        message: "Error verifying GST. Please try again.",
       });
       setFormData((prev) => ({ ...prev, gstVerified: false }));
       return false;
@@ -73,54 +75,31 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
       setFormData((prev) => ({ ...prev, gstVerified: false }));
       return false;
     }
-
     return await verifyGSTWithAPI(gst);
   };
-  // const validateGST = (gst) => {
-  //   const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
-  //   if (!gst || !gstRegex.test(gst)) {
-  //     setGstStatus({ type: "danger", message: "Invalid GST format." });
-  //     setFormData((prev) => ({ ...prev, gstVerified: false }));
-  //     return false;
-  //   }
-  //   setGstStatus({ type: "success", message: "GST Verified ✅" });
-  //   setFormData((prev) => ({ ...prev, gstVerified: true }));
-  //   return true;
-  // };
 
-  // Handle input changes
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => {
-      const newFormData = {
-        ...prev,
-        [name]: value,
-        ...(name === "firmPanNumber" && { firmPanVerified: false, firmPanStatus: null }),
-        ...(name === "gstNumber" && { gstVerified: false, gstStatus: null }),
-      };
-      console.log(`Updated formData for ${name}:`, newFormData);
-      return newFormData;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "firmPanNumber" && { firmPanVerified: false, firmPanStatus: null }),
+      ...(name === "gstNumber" && { gstVerified: false, gstStatus: null }),
+    }));
 
     if (name === "firmPanNumber") validateFirmPAN(value);
-    if (name === "gstNumber") validateGST(value);
+    if (name === "gstNumber") await validateGST(value);
   };
 
-  // Handle file uploads
   const handleFileChange = (fieldName) => (e) => {
     const file = e.target.files[0];
     if (file && file.size <= 2 * 1024 * 1024) {
-      setFormData((prev) => {
-        const newFormData = { ...prev, [fieldName]: file };
-        console.log(`File uploaded for ${fieldName}:`, file);
-        return newFormData;
-      });
+      setFormData((prev) => ({ ...prev, [fieldName]: file }));
     } else {
       alert("File size must be under 2MB.");
     }
   };
 
-  // Check step completion with detailed logging
   useEffect(() => {
     const requiredFields = {
       businessName: formData.businessName,
@@ -134,33 +113,19 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
       addressProofFile: formData.addressProofFile,
     };
 
-    const isFieldValid = (field, fieldName) => {
-      if (typeof field === "string") {
-        const isValid = field.trim() !== "";
-        console.log(`${fieldName}: "${field}" -> ${isValid ? "Valid" : "Invalid (empty)"}`);
-        return isValid;
-      }
-      const isValid = field !== null && field !== undefined;
-      console.log(`${fieldName}: ${field ? field.name : "null/undefined"} -> ${isValid ? "Valid" : "Invalid"}`);
-      return isValid;
+    const isFieldValid = (field) => {
+      if (typeof field === "string") return field.trim() !== "";
+      return field !== null && field !== undefined;
     };
 
-    const fieldValidationResults = Object.entries(requiredFields).map(([key, value]) =>
-      isFieldValid(value, key)
-    );
-    const allFieldsValid = fieldValidationResults.every((result) => result);
+    const allFieldsValid = Object.values(requiredFields).every(isFieldValid);
     const isVerified = formData.firmPanVerified && formData.gstVerified;
-
-    console.log("Field Validation Results:", fieldValidationResults);
-    console.log("All Fields Valid:", allFieldsValid);
-    console.log("Verification Status:", {
-      firmPanVerified: formData.firmPanVerified,
-      gstVerified: formData.gstVerified,
-    });
     const allFieldsFilled = allFieldsValid && isVerified;
-    console.log("Step Complete (allFieldsFilled):", allFieldsFilled);
 
-    setStepComplete(allFieldsFilled);
+    if (allFieldsFilled !== prevCompleteRef.current) {
+      setStepComplete(allFieldsFilled);
+      prevCompleteRef.current = allFieldsFilled;
+    }
   }, [
     formData.businessName,
     formData.businessType,
@@ -173,7 +138,6 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
     formData.firmPanFile,
     formData.businessRegistrationFile,
     formData.addressProofFile,
-    setStepComplete,
   ]);
 
   return (
@@ -245,8 +209,9 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
             <button
               onClick={() => validateFirmPAN(formData.firmPanNumber)}
               disabled={formData.firmPanVerified}
-              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${formData.firmPanVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
-                }`}
+              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${
+                formData.firmPanVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
+              }`}
             >
               Verify
             </button>
@@ -294,8 +259,9 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
             <button
               onClick={() => validateGST(formData.gstNumber)}
               disabled={formData.gstVerified}
-              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${formData.gstVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
-                }`}
+              className={`px-4 py-4 text-base bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-r-lg transition-all duration-300 ${
+                formData.gstVerified ? "opacity-50 cursor-not-allowed" : "hover:from-indigo-600 hover:to-blue-600"
+              }`}
             >
               Verify
             </button>
