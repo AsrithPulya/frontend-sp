@@ -3,6 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 const BankDetails = ({ formData, setFormData, setStepComplete }) => {
   const [verificationStatus, setVerificationStatus] = useState(null);
   const [uploadStatus, setUploadStatus] = useState(null);
+  const [uploadedDocs, setUploadedDocs] = useState(() => {
+    // Initialize from localStorage if available
+    const savedDocs = localStorage.getItem('uploadedDocs');
+    return savedDocs ? JSON.parse(savedDocs) : {};
+  });
   const prevCompleteRef = useRef(false); // Track previous completion status
 
   const bankFileInputRef = useRef(null);
@@ -12,13 +17,60 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
     setFormData((prev) => ({ ...prev, [name]: value, bankVerified: false }));
   };
 
-  const handleFileChange = (fieldName) => (e) => {
+  const handleFileChange = (fieldName) => async (e) => {
     const file = e.target.files[0];
+    
     if (file && file.size <= 2 * 1024 * 1024) {
+      // Update formData with the selected file
       setFormData((prev) => ({ ...prev, [fieldName]: file }));
-      setUploadStatus("Upload Successful");
+      
+      // Prepare form data for API
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+
+      try {
+        const response = await fetch('https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/docs/api/docupload', {
+          method: 'POST',
+          body: uploadData,
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+          // Store the uploaded file URL with document type
+          setUploadedDocs((prev) => {
+            const newDocs = {
+              ...prev,
+              [fieldName]: result.file_url
+            };
+            // Save to localStorage
+            localStorage.setItem('uploadedDocs', JSON.stringify(newDocs));
+            return newDocs;
+          });
+          setUploadStatus("Upload Successful");
+        } else {
+          alert(result.message || 'File upload failed');
+          setUploadStatus("File upload failed");
+          // Clear the file input if upload fails
+          setFormData((prev) => ({ ...prev, [fieldName]: null }));
+          if (bankFileInputRef.current) {
+            bankFileInputRef.current.value = '';
+          }
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert('An error occurred while uploading the file');
+        setUploadStatus("Upload failed due to an error");
+        setFormData((prev) => ({ ...prev, [fieldName]: null }));
+        if (bankFileInputRef.current) {
+          bankFileInputRef.current.value = '';
+        }
+      }
     } else {
       setUploadStatus("File size must be under 2MB.");
+      if (bankFileInputRef.current) {
+        bankFileInputRef.current.value = '';
+      }
     }
   };
 
@@ -198,7 +250,11 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
           />
         </div>
       </div>
-      {uploadStatus && <p className="mt-2 text-base text-green-600">{uploadStatus}</p>}
+      {uploadStatus && (
+        <p className={`mt-2 text-base ${uploadStatus.includes("failed") ? "text-red-600" : "text-green-600"}`}>
+          {uploadStatus}
+        </p>
+      )}
     </div>
   );
 };
