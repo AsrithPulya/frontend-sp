@@ -33,11 +33,6 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
 
   const verifyGSTWithAPI = async (gst) => {
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        setGstStatus({ type: "danger", message: "Authentication token not found" });
-        return false;
-      }
 
       const formDataToSend = new FormData();
       formDataToSend.append("gst_number", gst);

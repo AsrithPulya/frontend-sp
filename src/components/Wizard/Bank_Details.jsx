@@ -76,13 +76,6 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
 
   const verifyBankDetails = async () => {
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        setVerificationStatus("⚠️ Authentication token not found");
-        setFormData((prev) => ({ ...prev, bankVerified: false }));
-        return;
-      }
-
       const isValidAccount = /^[0-9]{9,18}$/.test(formData.accountNumber);
       const isValidIFSC = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc);
       if (!isValidAccount || !isValidIFSC || formData.accountNumber !== formData.confirmAccountNumber) {
