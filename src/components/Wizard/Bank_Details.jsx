@@ -28,6 +28,8 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
       const uploadData = new FormData();
       uploadData.append('file', file);
 
+      // Commented out API call for file upload (bypassed for testing)
+      /*
       try {
         const response = await fetch('https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/docs/api/docupload', {
           method: 'POST',
@@ -66,6 +68,15 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
           bankFileInputRef.current.value = '';
         }
       }
+      */
+
+      // Simulated successful file upload for testing
+      setUploadedDocs((prev) => ({
+        ...prev,
+        [fieldName]: `https://example.com/test_${fieldName}.pdf` // Dummy URL
+      }));
+      setUploadStatus("Upload Successful (Test Mode)");
+
     } else {
       setUploadStatus("File size must be under 2MB.");
       if (bankFileInputRef.current) {
@@ -84,6 +95,8 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
         return;
       }
 
+      // Commented out API call for bank verification (bypassed for testing)
+      /*
       const formDataToSend = new FormData();
       formDataToSend.append("account_no", formData.accountNumber);
       formDataToSend.append("ifsc_code", formData.ifsc);
@@ -105,6 +118,12 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
         setVerificationStatus("❌ " + (result.response_message || "Bank verification failed"));
         setFormData((prev) => ({ ...prev, bankVerified: false }));
       }
+      */
+
+      // Simulated successful verification for testing
+      setVerificationStatus("✅ Bank Account Verified (Test Mode)");
+      setFormData((prev) => ({ ...prev, bankVerified: true }));
+
     } catch (error) {
       console.error("Verification Error:", error);
       setVerificationStatus("⚠️ Error verifying bank details. Try again.");

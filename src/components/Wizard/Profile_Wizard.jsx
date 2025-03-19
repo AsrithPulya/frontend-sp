@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import Navbar from "../Shared/Navbar";
-import Sidebar from "../Shared/Sidebar";
+import Sidebar from "../Shared/Sidebar"; 
 import PersonalDetails from "./Personal_Details";
 import BusinessDetails from "./Business_Details";
 import BankDetails from "./Bank_Details";
@@ -58,7 +58,45 @@ const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
   const handleSubmit = () => {
-    console.log("Submitted Data: ", formData);
+    const uploadedDocs = JSON.parse(localStorage.getItem("uploadedDocs") || "{}");
+
+    const submissionData = {
+      fullName: formData.fullName,
+      mobileNumber: formData.mobile,
+      email: formData.email,
+      dateOfBirth: formData.dob,
+      address1: formData.address1,
+      address2: formData.address2,
+      panNumber: formData.pan,
+      panVerifyStatus: formData.panVerified ? 1 : 0,
+      aadhaarNumber: formData.aadhaar,
+      aadhaarVerifyStatus: formData.aadhaarVerified ? 1 : 0,
+      panImgUrl: uploadedDocs.panFile,
+      aadhaarImgUrl: uploadedDocs.aadhaarFront,
+      personAddressVerifyStatus: 1, // Static as no corresponding field in formData
+      businessName: formData.businessName,
+      entityType: formData.businessType,
+      businessAddress: `${formData.address1 || ""}, ${formData.address2 || ""}`.trim(),
+      firmPanNumber: formData.firmPanNumber,
+      firmPanVerifyStatus: formData.firmPanVerified ? 1 : 0,
+      gstNumber: formData.gstNumber,
+      gstVerifyStatus: formData.gstVerified ? 1 : 0,
+      businessRegisterCertUrl: uploadedDocs.businessRegistrationFile,
+      businessAddressProof: uploadedDocs.addressProofFile,
+      businessAddressVerifyStatus: 1, // Static as no corresponding field in formData
+      bankName: formData.bankName,
+      accountNumber: formData.accountNumber,
+      ifscCode: formData.ifsc,
+      bankVerifyStatus: formData.bankVerified ? 1 : 0,
+      bankChequeStatementUrl: uploadedDocs.bankDocument,
+      topLevelUserId: "ZONE-1", // Static as no corresponding field in formData
+      userType: "user", // Changed to "user" as requested
+      profileCreatedDate: new Date().toISOString().split("T")[0], // Dynamic date
+      guid: "",
+      accountStatus: 1, // Static as no corresponding field in formData
+    };
+
+    console.log("Submitted Data: ", submissionData);
     alert("Form Submitted Successfully!");
   };
 
