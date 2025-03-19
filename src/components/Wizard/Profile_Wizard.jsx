@@ -57,47 +57,68 @@ const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
-  const handleSubmit = () => {
-    const uploadedDocs = JSON.parse(localStorage.getItem("uploadedDocs") || "{}");
-
-    const submissionData = {
-      fullName: formData.fullName,
-      mobileNumber: formData.mobile,
-      email: formData.email,
-      dateOfBirth: formData.dob,
-      address1: formData.address1,
-      address2: formData.address2,
-      panNumber: formData.pan,
-      panVerifyStatus: formData.panVerified ? 1 : 0,
-      aadhaarNumber: formData.aadhaar,
-      aadhaarVerifyStatus: formData.aadhaarVerified ? 1 : 0,
-      panImgUrl: uploadedDocs.panFile,
-      aadhaarImgUrl: uploadedDocs.aadhaarFront,
-      personAddressVerifyStatus: 1, // Static as no corresponding field in formData
-      businessName: formData.businessName,
-      entityType: formData.businessType,
-      businessAddress: `${formData.address1 || ""}, ${formData.address2 || ""}`.trim(),
-      firmPanNumber: formData.firmPanNumber,
-      firmPanVerifyStatus: formData.firmPanVerified ? 1 : 0,
-      gstNumber: formData.gstNumber,
-      gstVerifyStatus: formData.gstVerified ? 1 : 0,
-      businessRegisterCertUrl: uploadedDocs.businessRegistrationFile,
-      businessAddressProof: uploadedDocs.addressProofFile,
-      businessAddressVerifyStatus: 1, // Static as no corresponding field in formData
-      bankName: formData.bankName,
-      accountNumber: formData.accountNumber,
-      ifscCode: formData.ifsc,
-      bankVerifyStatus: formData.bankVerified ? 1 : 0,
-      bankChequeStatementUrl: uploadedDocs.bankDocument,
-      topLevelUserId: "ZONE-1", // Static as no corresponding field in formData
-      userType: "user", // Changed to "user" as requested
-      profileCreatedDate: new Date().toISOString().split("T")[0], // Dynamic date
-      guid: "",
-      accountStatus: 1, // Static as no corresponding field in formData
-    };
-
-    console.log("Submitted Data: ", submissionData);
-    alert("Form Submitted Successfully!");
+  const handleSubmit = async () => {
+    try {
+      const uploadedDocs = JSON.parse(localStorage.getItem("uploadedDocs") || "{}");
+      const token = localStorage.getItem("authToken"); // Assuming the token is stored with key "token"
+  
+      const submissionData = {
+        fullName: formData.fullName,
+        mobileNumber: formData.mobile,
+        email: formData.email,
+        dateOfBirth: formData.dob,
+        address1: formData.address1,
+        address2: formData.address2,
+        panNumber: formData.pan,
+        panVerifyStatus: formData.panVerified ? 1 : 0,
+        aadhaarNumber: formData.aadhaar,
+        aadhaarVerifyStatus: formData.aadhaarVerified ? 1 : 0,
+        panImgUrl: uploadedDocs.panFile,
+        aadhaarImgUrl: uploadedDocs.aadhaarFront,
+        personAddressVerifyStatus: 1,
+        businessName: formData.businessName,
+        entityType: formData.businessType,
+        businessAddress: `${formData.address1 || ""}, ${formData.address2 || ""}`.trim(),
+        firmPanNumber: formData.firmPanNumber,
+        firmPanVerifyStatus: formData.firmPanVerified ? 1 : 0,
+        gstNumber: formData.gstNumber,
+        gstVerifyStatus: formData.gstVerified ? 1 : 0,
+        businessRegisterCertUrl: uploadedDocs.businessRegistrationFile,
+        businessAddressProof: uploadedDocs.addressProofFile,
+        businessAddressVerifyStatus: 1,
+        bankName: formData.bankName,
+        accountNumber: formData.accountNumber,
+        ifscCode: formData.ifsc,
+        bankVerifyStatus: formData.bankVerified ? 1 : 0,
+        bankChequeStatementUrl: uploadedDocs.bankDocument,
+        topLevelUserId: "ZONE-1",
+        userType: "user",
+        profileCreatedDate: new Date().toISOString().split("T")[0],
+        guid: "",
+        accountStatus: 1,
+      };
+  
+      const response = await fetch("https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/profile/distributorupdate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(submissionData),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      console.log("API Response:", result);
+      alert("Form Submitted Successfully!");
+  
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Failed to submit form. Please try again.");
+    }
   };
 
   const steps = [
