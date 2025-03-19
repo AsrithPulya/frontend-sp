@@ -98,7 +98,7 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
 
       const result = await response.json();
 
-      if (response.ok && result.code === 100) {
+      if (response.ok || result.code === 100) {
         setVerificationStatus("✅ " + (result.response_message || "Bank Account Verified"));
         setFormData((prev) => ({ ...prev, bankVerified: true }));
       } else {
