@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Shared/Navbar";
 import Sidebar from "../components/Shared/Sidebar";
+import { toast } from "react-toastify"; // Import toast
+
 
 const Products = () => {
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [unsubscribed, setUnsubscribed] = useState([]);
   const [subscribed, setSubscribed] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -30,6 +35,7 @@ const Products = () => {
       setProducts(mockProducts);
       setUnsubscribed(new Array(mockProducts.length).fill(false));
       setSubscribed(new Array(mockProducts.length).fill(false));
+      setSelectedProducts(new Array(mockProducts.length).fill(false));
     };
 
     fetchProducts();
@@ -55,6 +61,26 @@ const Products = () => {
     );
   };
 
+  const handleSelectProduct = (productId) => {
+    setSelectedProducts((prev) =>
+      prev.map((status, index) => (index + 1 === productId ? !status : status))
+    );
+  };
+
+  const handleSelectAll = () => {
+    const allSelected = selectedProducts.every(Boolean);
+    setSelectedProducts(new Array(products.length).fill(!allSelected));
+  };
+
+  const handleProceedToPayment = () => {
+    const selectedProductDetails = products.filter((_, index) => selectedProducts[index]);
+    if (selectedProductDetails.length > 0) {
+      navigate('/payment', { state: { selectedProducts: selectedProductDetails } });
+    } else {
+      toast.error("Please select at least one product to proceed.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-200">
       <Navbar toggleSidebar={toggleSidebar} />
@@ -63,22 +89,48 @@ const Products = () => {
         <div
           className={`flex-1 transition-all duration-300 ${
             isSidebarOpen ? "ml-56" : "ml-16"
-          } mt-16`} // Adjusted ml-64 to ml-56 to move content more to the left
+          } mt-16`}
         >
           <main className="p-6 md:p-8">
-            <div className="mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Available Packages</h2>
-              <p className="text-gray-600 text-lg">Discover powerful tools to grow your business seamlessly.</p>
+            <div className="mb-8 flex justify-between items-center">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Available Packages</h2>
+                <p className="text-gray-600 text-lg">Discover powerful tools to grow your business seamlessly.</p>
+              </div>
+              <div className="space-x-4">
+                <button
+                  onClick={handleSelectAll}
+                  className="px-4 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700 transition-all duration-300"
+                >
+                  {selectedProducts.every(Boolean) ? "Deselect All" : "Select All"}
+                </button>
+                <button
+                  onClick={handleProceedToPayment}
+                  className="px-4 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 transition-all duration-300"
+                >
+                  Proceed to Payment
+                </button>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               {products.length > 0 ? (
                 products.map((product) => (
                   <div
                     key={product.id}
-                    className="bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 p-6 flex flex-col h-72"
+                    className={`bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 p-6 flex flex-col h-72 ${
+                      selectedProducts[product.id - 1] ? "ring-2 ring-green-500" : ""
+                    }`}
                   >
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedProducts[product.id - 1]}
+                        onChange={() => handleSelectProduct(product.id)}
+                        className="mr-2 h-4 w-4 text-green-500"
+                      />
+                      <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
+                    </div>
                     <div className="flex flex-col flex-grow min-h-0">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{product.name}</h3>
                       {unsubscribed[product.id - 1] ? (
                         <p className="text-gray-500 text-sm mb-2 flex items-center">
                           <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>

@@ -51,8 +51,9 @@ const Login = () => {
       // Prepare the form-data payload
       const formData = new FormData();
       formData.append("uname", contact); // Email or mobile number
-      formData.append("usertype", "Distributor");
+      formData.append("usertype", "Zone");
       formData.append("ltype", "email");
+      formData.append("user_under", "GLOBLE-1");
   
       // Log FormData entries for debugging
       for (let [key, value] of formData.entries()) {
@@ -69,6 +70,8 @@ const Login = () => {
       if (!response.data || response.status !== 200) {
         throw new Error("Failed to send OTP. Please try again.");
       }
+      const user_under = response.data.user_under;
+      localStorage.setItem("user_under");
   
       // Log the response for debugging
       console.log("API Response:", response.data);

@@ -1,8 +1,23 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const SupportingDocuments = ({ formData, setFormData, setStepComplete }) => {
-  const prevCompleteRef = useRef(false); // Track previous completion status
+  const prevCompleteRef = useRef(false);
   const fileInputRef = useRef(null);
+  const [documentList, setDocumentList] = useState([]);
+
+  // Fetch documents from localStorage on mount
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("submissionData")) || {};
+    const documents = [
+      { name: "Aadhaar Card (Front)", url: storedData.aadhaarFront, verifyStatus: storedData.aadhaarVerifyStatus },
+      { name: "Business Address Proof", url: storedData.addressProofFile, verifyStatus: storedData.businessAddressVerifyStatus },
+      { name: "Bank Document", url: storedData.bankDocument, verifyStatus: storedData.bankVerifyStatus },
+      { name: "Business Registration Certificate", url: storedData.businessRegistrationFile, verifyStatus: storedData.gstVerifyStatus },
+      { name: "Firm PAN Card", url: storedData.firmPanFile, verifyStatus: storedData.firmPanVerifyStatus },
+      { name: "PAN Card", url: storedData.panFile, verifyStatus: storedData.panVerifyStatus },
+    ].filter(doc => doc.url); // Only include documents with URLs
+    setDocumentList(documents);
+  }, []);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -22,42 +37,39 @@ const SupportingDocuments = ({ formData, setFormData, setStepComplete }) => {
     }
   };
 
-  const getDocumentStatus = (fileName) => {
-    const statuses = {
-      "Business address proof": { status: "Verification in Progress", color: "bg-yellow-100 text-yellow-800" },
-      "Settlement bank account details": { status: "Online Verified", color: "bg-green-100 text-green-800" },
-      "PAN Card": { status: "Verification in Progress", color: "bg-yellow-100 text-yellow-800" },
-      "Personal address proof": { status: "Verification in Progress", color: "bg-yellow-100 text-yellow-800" },
-      "Beginner Work Out card hawk.pdf": { status: "Uploaded", color: "bg-gray-100 text-gray-800" },
+  const getDocumentStatus = (doc) => {
+    if (!doc.url) {
+      return { status: "Not Uploaded", color: "bg-red-100 text-red-800" };
+    }
+    
+    const statusMap = {
+      1: { status: "Online Verified", color: "bg-green-100 text-green-800" },
+      0: { status: "Verification in Progress", color: "bg-yellow-100 text-yellow-800" },
     };
-    return statuses[fileName] || { status: "Uploaded", color: "bg-gray-100 text-gray-800" };
+    
+    return statusMap[doc.verifyStatus] || { status: "Uploaded", color: "bg-gray-100 text-gray-800" };
   };
 
   useEffect(() => {
-    const allFieldsFilled = formData.uploadedDocuments.length > 0;
-
-    if (allFieldsFilled !== prevCompleteRef.current) {
-      setStepComplete(allFieldsFilled);
-      prevCompleteRef.current = allFieldsFilled;
+    // Enable submit button only if there are documents in localStorage
+    const hasDocuments = documentList.length > 0;
+    
+    if (hasDocuments !== prevCompleteRef.current) {
+      setStepComplete(hasDocuments); // True only if documents exist in localStorage
+      prevCompleteRef.current = hasDocuments;
     }
-  }, [formData.uploadedDocuments]);
+  }, [documentList, setStepComplete]);
 
   return (
     <div className="space-y-8">
       <h2 className="text-3xl font-semibold text-gray-800">Supporting Documents</h2>
       <div>
         <div className="space-y-4">
-          {[
-            "Business address proof",
-            "Settlement bank account details",
-            "PAN Card",
-            "Personal address proof",
-            "Beginner Work Out card hawk.pdf",
-          ].map((doc, index) => {
+          {documentList.map((doc, index) => {
             const { status, color } = getDocumentStatus(doc);
             return (
               <div key={index} className="flex items-center justify-between">
-                <span className="text-base text-gray-700">{doc}</span>
+                <span className="text-base text-gray-700">{doc.name}</span>
                 <span className={`px-3 py-1 text-base rounded-full ${color}`}>{status}</span>
               </div>
             );

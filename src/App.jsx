@@ -9,6 +9,7 @@ import Products from './components/Products';
 import UserFormPage from './components/Create-User';
 import Sidebar from './components/Shared/Sidebar';
 import Navbar from './components/Shared/Navbar';
+import BankDetails from './components/Payment';
 
 // Layout component for pages with Sidebar and Navbar
 const MainLayout = ({ children }) => {
@@ -76,6 +77,15 @@ function App() {
             </MainLayout>
           }
         />
+        <Route
+          path="/payment"
+          element={
+            <MainLayout>
+              <BankDetails />
+            </MainLayout>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );
