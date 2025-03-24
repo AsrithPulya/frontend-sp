@@ -48,7 +48,7 @@ const BankDetails = () => {
 
     try {
       const response = await fetch(
-        "https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/docs/api/docupload",
+        "http://test.sabbpe.com/docs/api/docupload",
         {
           method: "POST",
           body: uploadFormData,
@@ -105,7 +105,7 @@ const BankDetails = () => {
       formDataToSend.append("statement_url", fileUrl); // Use the uploaded file URL
       formDataToSend.append("products_selected", productsSelected);
 
-      const response = await fetch("https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/profile/zonalpay", {
+      const response = await fetch("http://test.sabbpe.com/api/v1/profile/zonalpay", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`

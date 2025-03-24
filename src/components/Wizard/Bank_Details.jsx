@@ -30,7 +30,7 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
 
       // Commented out API call for file upload (bypassed for testing)
       try {
-        const response = await fetch('https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/docs/api/docupload', {
+        const response = await fetch('http://test.sabbpe.com/docs/api/docupload', {
           method: 'POST',
           body: uploadData,
         });
@@ -101,7 +101,7 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
       formDataToSend.append("ifsc_code", formData.ifsc);
 
       const response = await fetch(
-        "https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/zoop/bankaccountverify",
+        "http://test.sabbpe.com/api/v1/zoop/bankaccountverify",
         {
           method: "POST",
           body: formDataToSend,

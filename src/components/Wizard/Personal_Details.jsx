@@ -25,7 +25,7 @@ const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
       formDataToSend.append("pan_number", pan);
       formDataToSend.append("pan_name", fullName);
   
-      const response = await fetch("https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/zoop/getpanverify", {
+      const response = await fetch("http://test.sabbpe.com/api/v1/zoop/getpanverify", {
         method: "POST",
         body: formDataToSend,
       });
@@ -123,7 +123,7 @@ const PersonalDetails = ({ formData, setFormData, setStepComplete }) => {
       uploadData.append('file', file);
 
       try {
-        const response = await fetch('https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/docs/api/docupload', {
+        const response = await fetch('http://test.sabbpe.com/docs/api/docupload', {
           method: 'POST',
           body: uploadData,
         });

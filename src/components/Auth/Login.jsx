@@ -62,7 +62,7 @@ const Login = () => {
   
       // Make the API call using axios.post with CORS proxy, no headers
       const response = await axios.post(
-        "https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/auth/sendemailotp",
+        "http://test.sabbpe.com/api/v1/auth/sendemailotp",
         formData
       );
   
@@ -122,7 +122,7 @@ const Login = () => {
 
       // Make the API call using axios.post with CORS proxy
       const response = await axios.post(
-        "https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/auth/verifyotp",
+        "http://test.sabbpe.com/api/v1/auth/verifyotp",
         formData
       );
 

@@ -98,7 +98,7 @@ const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
         accountStatus: 1,
       };
   
-      const response = await fetch("https://cors-anywhere.herokuapp.com/http://test.sabbpe.com/api/v1/profile/distributorupdate", {
+      const response = await fetch("http://test.sabbpe.com/api/v1/profile/distributorupdate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
