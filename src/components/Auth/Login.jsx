@@ -71,7 +71,7 @@ const Login = () => {
         throw new Error("Failed to send OTP. Please try again.");
       }
       const user_under = response.data.user_under;
-      localStorage.setItem("user_under");
+      localStorage.setItem("user_under", user_under);
   
       // Log the response for debugging
       console.log("API Response:", response.data);
