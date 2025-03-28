@@ -1,5 +1,6 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useState } from 'react'; // Import useState
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Registration';
 import TransactionSuccess from './components/Transaction_Sucess';
@@ -13,15 +14,20 @@ import BankDetails from './components/Payment';
 import CreateDistributor from './components/Create-Distributor';
 
 // Layout component for pages with Sidebar and Navbar
-const MainLayout = ({ children }) => {
+const MainLayout = ({ children, isOpen, toggleSidebar }) => {
   const location = useLocation();
   console.log("MainLayout rendered, location:", location.pathname);
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar toggleSidebar={() => {}} />
+      <Navbar toggleSidebar={toggleSidebar} />
       <div className="flex flex-1">
-        <Sidebar isOpen={true} toggleSidebar={() => {}} />
-        <main className="flex-1 ml-80" style={{ marginTop: "64px" }}>
+        <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
+        <main
+          className={`flex-1 transition-all duration-500 ${
+            isOpen ? 'ml-72' : 'ml-0'
+          }`}
+          style={{ marginTop: '64px' }}
+        >
           {children}
         </main>
       </div>
@@ -30,18 +36,24 @@ const MainLayout = ({ children }) => {
 };
 
 function App() {
+  const [isOpen, setIsOpen] = useState(false); // State to control sidebar visibility
+
+  const toggleSidebar = () => {
+    setIsOpen((prev) => !prev); // Toggle the sidebar state
+  };
+
   return (
     <BrowserRouter>
       <Routes>
         {/* Routes without Sidebar/Navbar */}
         <Route path="/" element={<Login />} />
         <Route path="/User-Registration" element={<Register />} />
-        
+
         {/* Routes with Sidebar/Navbar wrapped in MainLayout */}
         <Route
           path="/User-Transaction-Success"
           element={
-            <MainLayout>
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
               <TransactionSuccess />
             </MainLayout>
           }
@@ -49,7 +61,7 @@ function App() {
         <Route
           path="/Profile"
           element={
-            <MainLayout>
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
               <ProfileWizard />
             </MainLayout>
           }
@@ -57,7 +69,7 @@ function App() {
         <Route
           path="/Dashboard"
           element={
-            <MainLayout>
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
               <Dashboard />
             </MainLayout>
           }
@@ -65,7 +77,7 @@ function App() {
         <Route
           path="/Products"
           element={
-            <MainLayout>
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
               <Products />
             </MainLayout>
           }
@@ -73,7 +85,7 @@ function App() {
         <Route
           path="/create-user"
           element={
-            <MainLayout>
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
               <UserFormPage />
             </MainLayout>
           }
@@ -81,7 +93,7 @@ function App() {
         <Route
           path="/payment"
           element={
-            <MainLayout>
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
               <BankDetails />
             </MainLayout>
           }
@@ -89,12 +101,11 @@ function App() {
         <Route
           path="/create-distributor"
           element={
-            <MainLayout>
+            <MainLayout isOpen={isOpen} toggleSidebar={toggleSidebar}>
               <CreateDistributor />
             </MainLayout>
           }
         />
-
       </Routes>
     </BrowserRouter>
   );

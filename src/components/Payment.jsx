@@ -14,7 +14,7 @@ const BankDetails = () => {
     bankName: "",
     amount: "",
     utrRef: "",
-    file: null,
+    file: null, // Stores the file URL after upload
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -26,8 +26,22 @@ const BankDetails = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, file: e.target.files[0] }));
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsLoading(true);
+    setErrors((prev) => ({ ...prev, file: null }));
+
+    try {
+      const fileUrl = await uploadDocument(file);
+      setFormData((prev) => ({ ...prev, file: fileUrl }));
+      setErrors((prev) => ({ ...prev, file: null }));
+    } catch (error) {
+      setErrors({ file: error.message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const validateForm = () => {
@@ -47,20 +61,20 @@ const BankDetails = () => {
     uploadFormData.append("file", file);
 
     try {
-      const response = await fetch(
-        "http://test.sabbpe.com/docs/api/docupload",
-        {
-          method: "POST",
-          body: uploadFormData,
-        }
-      );
-      
+      const response = await fetch("http://test.sabbpe.com/docs/api/docupload", {
+        method: "POST",
+        body: uploadFormData,
+      });
+
       if (!response.ok) {
-        throw new Error("Document upload failed");
+        throw new Error(`Document upload failed with status: ${response.status}`);
       }
 
       const data = await response.json();
-      return data.file_url; // Assuming the API returns { file_url: "..." }
+      if (!data.file_url) {
+        throw new Error("No file_url returned from upload API");
+      }
+      return data.file_url;
     } catch (error) {
       throw new Error("Failed to upload document: " + error.message);
     }
@@ -68,33 +82,22 @@ const BankDetails = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
+    setErrors({}); // Clear previous API errors
+
     try {
       const token = localStorage.getItem("authToken");
       if (!token) {
         setErrors({ api: "Authentication token not found. Please log in again." });
-        setIsLoading(false);
         return;
       }
 
-      // Upload document first and get file_url
-      let fileUrl;
-      try {
-        fileUrl = await uploadDocument(formData.file);
-      } catch (uploadError) {
-        setErrors({ api: uploadError.message });
-        setIsLoading(false);
-        return;
-      }
-
-      // Prepare products_selected
-      const productsSelected = selectedProducts.map(p => p.id).join(",");
+      const productsSelected = selectedProducts.map((p) => p.id).join(",");
       if (!productsSelected) {
         setErrors({ api: "No products selected" });
-        setIsLoading(false);
         return;
       }
 
@@ -102,34 +105,51 @@ const BankDetails = () => {
       formDataToSend.append("bank_name", formData.bankName);
       formDataToSend.append("amount", formData.amount);
       formDataToSend.append("utr_no", formData.utrRef);
-      formDataToSend.append("statement_url", fileUrl); // Use the uploaded file URL
+      formDataToSend.append("statement_url", formData.file);
       formDataToSend.append("products_selected", productsSelected);
+
+      // Log the data being sent for debugging
+      console.log("Submitting form data:", {
+        bank_name: formData.bankName,
+        amount: formData.amount,
+        utr_no: formData.utrRef,
+        statement_url: formData.file,
+        products_selected: productsSelected,
+      });
 
       const response = await fetch("http://test.sabbpe.com/api/v1/profile/zonalpay", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: formDataToSend,
       });
 
+      if (!response.ok) {
+        throw new Error(`API request failed with status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log("API response:", data); // Log response for debugging
 
       if (data.code === 200) {
         navigate("/payment", {
           state: {
             selectedProducts,
-            bankDetails: { ...formData, statement_url: fileUrl },
+            bankDetails: { ...formData, statement_url: formData.file },
           },
         });
       } else if (data.code === 201) {
         setErrors({ api: "Token expired or payment record not updated" });
-        if (data.status.includes("Token expired")) {
+        if (data.status && data.status.includes("Token expired")) {
           localStorage.removeItem("authToken");
           navigate("/login");
         }
+      } else {
+        setErrors({ api: `Unexpected response code: ${data.code}` });
       }
     } catch (error) {
+      console.error("Submission error:", error);
       setErrors({ api: "An error occurred while updating payment details: " + error.message });
     } finally {
       setIsLoading(false);
@@ -215,6 +235,7 @@ const BankDetails = () => {
                       onChange={handleInputChange}
                       className="w-full p-4 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:shadow-md"
                       placeholder="Enter bank name"
+                      disabled={isLoading}
                     />
                     {errors.bankName && (
                       <p className="mt-2 text-sm text-red-600">{errors.bankName}</p>
@@ -236,6 +257,7 @@ const BankDetails = () => {
                       onChange={handleInputChange}
                       className="w-full p-4 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:shadow-md"
                       placeholder="Enter amount"
+                      disabled={isLoading}
                     />
                     {errors.amount && (
                       <p className="mt-2 text-sm text-red-600">{errors.amount}</p>
@@ -257,6 +279,7 @@ const BankDetails = () => {
                       onChange={handleInputChange}
                       className="w-full p-4 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:shadow-md"
                       placeholder="Enter UTR/Reference No."
+                      disabled={isLoading}
                     />
                     {errors.utrRef && (
                       <p className="mt-2 text-sm text-red-600">{errors.utrRef}</p>
@@ -277,10 +300,14 @@ const BankDetails = () => {
                       onChange={handleFileChange}
                       className="w-full p-3 text-base border border-gray-200 rounded-lg shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-base file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all duration-300 hover:shadow-md"
                       accept="image/*,.pdf"
+                      disabled={isLoading}
                     />
-                    {formData.file && (
-                      <p className="mt-2 text-sm text-gray-600 truncate">
-                        {formData.file.name}
+                    {isLoading && !errors.file && (
+                      <p className="mt-2 text-sm text-gray-600">Uploading file...</p>
+                    )}
+                    {formData.file && !errors.file && !isLoading && (
+                      <p className="mt-2 text-sm text-green-600 truncate">
+                        File uploaded successfully
                       </p>
                     )}
                     {errors.file && (

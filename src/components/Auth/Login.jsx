@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo.jpeg";
 import background from "../assets/background.jpg";
-import axios from "axios"; // Import axios
-import { toast } from "react-toastify"; // Import toast
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [contact, setContact] = useState("");
   const [otp, setOtp] = useState("");
+  const [role, setRole] = useState("Zonal"); // Default role set to "Zonal"
   const [error, setError] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const navigate = useNavigate();
@@ -18,7 +19,6 @@ const Login = () => {
   const isValidPhone = (phone) => /^[0-9]{10}$/.test(phone);
 
   const handleSendOtp = async () => {
-    // Validate input
     if (!isValidEmail(contact) && !isValidPhone(contact)) {
       setError("Enter a valid email or mobile number.");
       toast.error("Invalid email or mobile number!", {
@@ -32,7 +32,7 @@ const Login = () => {
       });
       return;
     }
-  
+
     const isEmail = isValidEmail(contact);
     if (!isEmail) {
       setError("This API only supports email-based OTP for now.");
@@ -46,37 +46,31 @@ const Login = () => {
       });
       return;
     }
-  
+
     try {
-      // Prepare the form-data payload
       const formData = new FormData();
-      formData.append("uname", contact); // Email or mobile number
-      formData.append("usertype", "Zone");
+      formData.append("uname", contact);
+      formData.append("usertype", role); // Updated to use selected role
       formData.append("ltype", "email");
       formData.append("user_under", "GLOBLE-1");
-  
-      // Log FormData entries for debugging
+
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
       }
-  
-      // Make the API call using axios.post with CORS proxy, no headers
+
       const response = await axios.post(
         "http://test.sabbpe.com/api/v1/auth/sendemailotp",
         formData
       );
-  
-      // Check if the request was successful
+
       if (!response.data || response.status !== 200) {
         throw new Error("Failed to send OTP. Please try again.");
       }
       const user_under = response.data.user_under;
       localStorage.setItem("user_under", user_under);
-  
-      // Log the response for debugging
+
       console.log("API Response:", response.data);
-  
-      // On success, update the UI
+
       setOtpSent(true);
       setError("");
       toast.success("OTP Sent Successfully!", {
@@ -104,46 +98,37 @@ const Login = () => {
   };
 
   const handleOtpLogin = async () => {
-    // Validate OTP input
     if (!otp) {
       return setError("Please enter the OTP.");
     }
 
     try {
-      // Prepare the form-data payload
       const formData = new FormData();
-      formData.append("uname", contact); // Email used for sending OTP
-      formData.append("otp", otp);       // OTP entered by user
+      formData.append("uname", contact);
+      formData.append("otp", otp);
 
-      // Log FormData entries for debugging
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
       }
 
-      // Make the API call using axios.post with CORS proxy
       const response = await axios.post(
         "http://test.sabbpe.com/api/v1/auth/verifyotp",
         formData
       );
 
-      // Check if the request was successful
       if (!response.data || response.status !== 200) {
         throw new Error(`OTP verification failed: ${response.status} - ${response.statusText}`);
       }
 
-
-      // Log the response for debugging
       console.log("API Response (Verify OTP):", response.data);
-      // Save the token to localStorage (adjust the key based on your API response)
-      const token = response.data.token; // Replace 'token' with the actual field name from your API
+      const token = response.data.token;
       if (token) {
-        localStorage.setItem("authToken", token); // Store the token with a key like "authToken"
+        localStorage.setItem("authToken", token);
         console.log("Token saved to localStorage:", token);
       } else {
         console.warn("No token found in response:", response.data);
       }
 
-      // On success, navigate to dashboard
       toast.success("Login Successful", {
         position: "top-right",
         autoClose: 3000,
@@ -152,7 +137,7 @@ const Login = () => {
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-      })
+      });
       navigate("/dashboard");
     } catch (err) {
       console.error("Error Details (Verify OTP):", {
@@ -173,11 +158,9 @@ const Login = () => {
         backgroundPosition: "center",
       }}
     >
-      {/* Overlay for better readability */}
       <div className="absolute inset-0 bg-black opacity-40"></div>
 
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md z-10 relative">
-        {/* Logo centered above the form */}
         <div className="flex justify-center mb-6">
           <img src={logo} alt="Company Logo" className="w-24 h-24 object-contain" />
         </div>
@@ -202,6 +185,41 @@ const Login = () => {
               onChange={(e) => setContact(e.target.value)}
               className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-200"
             />
+          </div>
+
+          {/* Role Selection Radio Buttons */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+            <div className="flex space-x-6">
+              <div className="flex items-center">
+                <input
+                  type="radio"
+                  id="zonal"
+                  name="role"
+                  value="Zonal"
+                  checked={role === "Zonal"}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                />
+                <label htmlFor="zonal" className="ml-2 text-sm text-gray-700">
+                  Zonal
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="radio"
+                  id="distributor"
+                  name="role"
+                  value="Distributor"
+                  checked={role === "Distributor"}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                />
+                <label htmlFor="distributor" className="ml-2 text-sm text-gray-700">
+                  Distributor
+                </label>
+              </div>
+            </div>
           </div>
 
           {otpSent && (

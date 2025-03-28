@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaUserCircle, FaSearch, FaBell } from "react-icons/fa";
-import logo from "../assets/Logo.jpeg";
+import logo from "../assets/Logo.jpeg"; // Ensure this path is correct
 import { motion } from "framer-motion";
 
 const Navbar = ({ toggleSidebar }) => {
@@ -16,8 +16,30 @@ const Navbar = ({ toggleSidebar }) => {
         background: "linear-gradient(90deg, #F5F8FA 0%, #E6F0FA 100%)",
       }}
     >
-      {/* Logo and Title */}
+      {/* Left Section: Hamburger Menu */}
       <div className="flex items-center space-x-4">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          onClick={toggleSidebar}
+          className="text-gray-700 hover:text-blue-600 focus:outline-none transition-colors"
+        >
+          <svg
+            className="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </motion.button>
+
+        {/* Logo and Title */}
         <motion.img
           whileHover={{ scale: 1.1, rotate: 5 }}
           src={logo}
@@ -26,8 +48,6 @@ const Navbar = ({ toggleSidebar }) => {
         />
         <h1 className="text-3xl font-bold text-gray-800 tracking-wide">SABBPE</h1>
       </div>
-
-     
 
       {/* Right Section: Search, Notifications, Profile */}
       <div className="flex items-center space-x-6">
@@ -96,17 +116,6 @@ const Navbar = ({ toggleSidebar }) => {
             </motion.div>
           )}
         </div>
-
-        {/* Mobile Menu Button */}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          onClick={toggleSidebar}
-          className="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none transition-colors"
-        >
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </motion.button>
       </div>
     </motion.header>
   );

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { logMsgToConsole, logOutUser } from './constants';
 
 export default function axiosInstance(history = null) {
-    const baseURL = `http://test.sabbpe.com/api/v1/auth/`;
+    const baseURL = `http://test.sabbpe.com/api/`;
     // const baseURL = process.env.REACT_APP_API_ENDPOINT;
     // let headers = {};
     // Might change this to take value from local app state
