@@ -1,16 +1,18 @@
-import './App.css';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Registration';
-import TransactionSuccess from './components/Transaction_Sucess';
-import ProfileWizard from './components/Wizard/Profile_Wizard';
-import Dashboard from './components/Dashboard/Dashboard';
-import Products from './components/Products';
-import UserFormPage from './components/Create-User';
-import Sidebar from './components/Shared/Sidebar';
-import Navbar from './components/Shared/Navbar';
-import BankDetails from './components/Payment';
-import CreateDistributor from './components/Create-Distributor';
+import "./App.css";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import Login from "./components/Auth/Login";
+import Register from "./components/Auth/Registration";
+import TransactionSuccess from "./components/Transaction_Sucess";
+import ProfileWizard from "./components/Wizard/Profile_Wizard";
+import Dashboard from "./components/Dashboard/Dashboard";
+import Products from "./components/Products";
+import UserFormPage from "./components/Create-User";
+import Sidebar from "./components/Shared/Sidebar";
+import Navbar from "./components/Shared/Navbar";
+import BankDetails from "./components/Payment";
+import CreateDistributor from "./components/Create-Distributor";
+import RecordsTable from "./pages/RecordsTable";
+import Distributors from "./pages/Distributors";
 
 // Layout component for pages with Sidebar and Navbar
 const MainLayout = ({ children }) => {
@@ -36,7 +38,7 @@ function App() {
         {/* Routes without Sidebar/Navbar */}
         <Route path="/" element={<Login />} />
         <Route path="/User-Registration" element={<Register />} />
-        
+
         {/* Routes with Sidebar/Navbar wrapped in MainLayout */}
         <Route
           path="/User-Transaction-Success"
@@ -94,7 +96,22 @@ function App() {
             </MainLayout>
           }
         />
-
+        <Route
+          path="/records-table"
+          element={
+            <MainLayout>
+              <RecordsTable />
+            </MainLayout>
+          }
+        />
+         <Route
+          path="/distributors"
+          element={
+            <MainLayout>
+              <Distributors/>
+            </MainLayout>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

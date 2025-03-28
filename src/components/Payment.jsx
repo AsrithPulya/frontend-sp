@@ -45,7 +45,8 @@ const BankDetails = () => {
   const uploadDocument = async (file) => {
     const uploadFormData = new FormData();
     uploadFormData.append("file", file);
-
+    // console.log(file)
+    
     try {
       const response = await fetch(
         "http://test.sabbpe.com/docs/api/docupload",
@@ -58,8 +59,8 @@ const BankDetails = () => {
       if (!response.ok) {
         throw new Error("Document upload failed");
       }
-
       const data = await response.json();
+      // console.log(data)
       return data.file_url; // Assuming the API returns { file_url: "..." }
     } catch (error) {
       throw new Error("Failed to upload document: " + error.message);
@@ -89,6 +90,7 @@ const BankDetails = () => {
         setIsLoading(false);
         return;
       }
+     
 
       // Prepare products_selected
       const productsSelected = selectedProducts.map(p => p.id).join(",");
@@ -98,6 +100,7 @@ const BankDetails = () => {
         return;
       }
 
+      console.log(fileUrl)
       const formDataToSend = new FormData();
       formDataToSend.append("bank_name", formData.bankName);
       formDataToSend.append("amount", formData.amount);
@@ -116,7 +119,7 @@ const BankDetails = () => {
       const data = await response.json();
 
       if (data.code === 200) {
-        navigate("/payment", {
+        navigate("/records-table", {
           state: {
             selectedProducts,
             bankDetails: { ...formData, statement_url: fileUrl },
@@ -129,6 +132,7 @@ const BankDetails = () => {
           navigate("/login");
         }
       }
+   
     } catch (error) {
       setErrors({ api: "An error occurred while updating payment details: " + error.message });
     } finally {
