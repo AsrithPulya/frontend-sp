@@ -80,8 +80,8 @@ const Navbar = ({ toggleSidebar }) => {
               <ul className="py-2">
                 <li>
                   <a
-                    href="#"
-                    className="block px-4 py-3 text-base text-gray-800 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    onClick={()=>navigate('/my-profile')}
+                    className="block px-4 py-3 text-base cursor-pointer text-gray-800 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                   >
                     My Profile
                   </a>

@@ -13,6 +13,7 @@ import BankDetails from "./components/Payment";
 import CreateDistributor from "./components/Create-Distributor";
 import RecordsTable from "./pages/RecordsTable";
 import Distributors from "./pages/Distributors";
+import MyProfile from "./pages/MyProfile";
 
 // Layout component for pages with Sidebar and Navbar
 const MainLayout = ({ children }) => {
@@ -110,6 +111,14 @@ function App() {
           element={
             <MainLayout>
               <Distributors/>
+            </MainLayout>
+          }
+        />
+         <Route
+          path="/my-profile"
+          element={
+            <MainLayout>
+              <MyProfile/>
             </MainLayout>
           }
         />
