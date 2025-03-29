@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FaTableList } from "react-icons/fa6";
 import {
   FaTachometerAlt,
   FaUserPlus,
@@ -15,7 +16,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [userActive, setUserActive] = useState(false);
-
+  const isPayment = localStorage.getItem("isPayment")==="true"
+  // console.log(isPayment)
   const userRole = localStorage.getItem("userRole");
   const isActive = (path) => location.pathname === path;
 
@@ -57,7 +59,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
-  console.log(userActive)
+  console.log(userActive);
 
   useEffect(() => {
     fetchDetails();
@@ -69,10 +71,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
     if (userActive === false && userRole === "distributor") {
       navigate("/Profile");
-    }else{
-      navigate("/Dashboard")
+    } else {
+      navigate("/Dashboard");
     }
-  }, [userRole,userActive]);
+  }, [userRole, userActive]);
 
   // console.log(userRole);
   // console.log(userActive)
@@ -117,9 +119,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <FaTachometerAlt className="text-2xl" />
               <span>Dashboard</span>
             </motion.button>
-  
+
             {/* Hide OnBoarding if userActive is true and userRole is "distributor" OR userRole is "Zone" */}
-            {!((userActive === true && userRole === "distributor") || userRole === "Zone") && (
+            {!(
+              (userActive === true && userRole === "distributor") ||
+              userRole === "Zone"
+            ) && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 onClick={() => handleNavigation("/Profile")}
@@ -133,7 +138,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <span>OnBoarding</span>
               </motion.button>
             )}
-  
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={() => handleNavigation("/create-user")}
@@ -146,7 +151,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <FaUserPlus className="text-2xl" />
               <span>Create User</span>
             </motion.button>
-  
+
             {userRole !== "distributor" && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -161,7 +166,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <span>Products</span>
               </motion.button>
             )}
-  
+            {isPayment && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                onClick={() => handleNavigation("/records-table")}
+                className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+                  isActive("/records-table")
+                    ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                    : "hover:bg-[#2563EB]"
+                }`}
+              >
+                <FaTableList className="text-2xl" />
+                {/* <FaExchangeAlt className="text-2xl" /> */}
+                <span>Records Table</span>
+              </motion.button>
+            )}
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={() => handleNavigation("/transactions")}
@@ -174,7 +194,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <FaExchangeAlt className="text-2xl" />
               <span>Transactions</span>
             </motion.button>
-  
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={() => handleNavigation("/settings")}
@@ -187,7 +207,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <FaCog className="text-2xl" />
               <span>Settings</span>
             </motion.button>
-  
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={() => handleNavigation("/help")}
@@ -205,7 +225,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       </nav>
     </motion.aside>
   );
-  
 };
 
 export default Sidebar;

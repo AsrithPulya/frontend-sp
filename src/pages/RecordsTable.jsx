@@ -9,9 +9,17 @@ const RecordsTable = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [email, setEmail] = useState("");
   const [isCreatingDistributor, setIsCreatingDistributor] = useState(false); // New loading state
-
+  const isPayment = localStorage.getItem("isPayment");
   const navigate = useNavigate();
 
+
+
+  useEffect(() => {
+    const isPayment = localStorage.getItem("isPayment");  // Get value from localStorage
+    if (isPayment !== "true") {  // Check if it's NOT "true"
+        navigate("/Dashboard");
+    }
+}, [navigate]);
   const fetchData = async () => {
     setLoading(true);
     setError(null);

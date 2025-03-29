@@ -159,6 +159,7 @@ const Login = () => {
         localStorage.setItem("userRole",role)
         localStorage.setItem("usertype",response.data.usertype)
         localStorage.setItem("isProfile",response.data.isprofile)
+        localStorage.setItem("isPayment",response.data.ispayment)
       } else {
         console.warn("No token found in response:", response.data);
       }
