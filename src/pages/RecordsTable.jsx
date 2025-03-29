@@ -152,7 +152,7 @@ const RecordsTable = () => {
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {record.pay_status === 1 && (
                     <button
-                      onClick={() => handleOpenModal(record)}
+                      onClick={() => navigate("/distributors")}
                       className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
                     >
                       Create Distributor
