@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaTachometerAlt, FaUserPlus, FaUser, FaBox, FaExchangeAlt, FaCog, FaQuestionCircle } from "react-icons/fa";
+import {
+  FaTachometerAlt,
+  FaUserPlus,
+  FaUser,
+  FaBox,
+  FaExchangeAlt,
+  FaCog,
+  FaQuestionCircle,
+} from "react-icons/fa";
 import { motion } from "framer-motion";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [userActive, setUserActive] = useState(false);
 
+  const userRole = localStorage.getItem("userRole");
   const isActive = (path) => location.pathname === path;
 
   const handleNavigation = (path) => {
@@ -15,6 +25,57 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     navigate(path);
   };
 
+  const token = localStorage.getItem("authToken");
+  // console.log(token)
+  const fetchDetails = async () => {
+    if (!token) {
+      return;
+    }
+    try {
+      const response = await fetch(
+        "http://test.sabbpe.com/api/v1/auth/fetchdistributor",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json(); // Parse the JSON response
+      console.log(data);
+      if (data.isprofile === false) {
+        setUserActive(data.isprofile);
+      } else if (data[0].account_status === 1) {
+        setUserActive(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log(userActive)
+
+  useEffect(() => {
+    fetchDetails();
+  }, []);
+
+  useEffect(() => {
+    if (userRole === "Zone") {
+      return; // Allow "Zone" users to access all pages freely
+    }
+    if (userActive === false && userRole === "distributor") {
+      navigate("/Profile");
+    }else{
+      navigate("/Dashboard")
+    }
+  }, [userRole,userActive]);
+
+  // console.log(userRole);
+  // console.log(userActive)
   return (
     <motion.aside
       initial={{ x: -300 }}
@@ -27,85 +88,124 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       </div>
       <div className="border-t border-gray-500 my-4"></div>
       <nav className="space-y-3">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          onClick={() => handleNavigation("/Dashboard")}
-          className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
-            isActive("/Dashboard")
-              ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
-              : "hover:bg-[#2563EB]"
-          }`}
-        >
-          <FaTachometerAlt className={`text-2xl ${isActive("/Dashboard") ? "text-white" : "hover:text-white"}`} />
-          <span>Dashboard</span>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          onClick={() => handleNavigation("/Profile")}
-          className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
-            isActive("/Profile") ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30" : "hover:bg-[#2563EB]"
-          }`}
-        >
-          <FaUser className={`text-2xl ${isActive("/Profile") ? "text-white" : "hover:text-white"}`} />
-          <span>OnBoarding</span>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          onClick={() => handleNavigation("/create-user")}
-          className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
-            isActive("/create-user")
-              ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
-              : "hover:bg-[#2563EB]"
-          }`}
-        >
-          <FaUserPlus className={`text-2xl ${isActive("/create-user") ? "text-white" : "hover:text-white"}`} />
-          <span>Create User</span>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          onClick={() => handleNavigation("/Products")}
-          className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
-            isActive("/Products") ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30" : "hover:bg-[#2563EB]"
-          }`}
-        >
-          <FaBox className={`text-2xl ${isActive("/Products") ? "text-white" : "hover:text-white"}`} />
-          <span>Products</span>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          onClick={() => handleNavigation("/transactions")}
-          className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
-            isActive("/transactions")
-              ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
-              : "hover:bg-[#2563EB]"
-          }`}
-        >
-          <FaExchangeAlt className={`text-2xl ${isActive("/transactions") ? "text-white" : "hover:text-white"}`} />
-          <span>Transactions</span>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          onClick={() => handleNavigation("/settings")}
-          className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
-            isActive("/settings") ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30" : "hover:bg-[#2563EB]"
-          }`}
-        >
-          <FaCog className={`text-2xl ${isActive("/settings") ? "text-white" : "hover:text-white"}`} />
-          <span>Settings</span>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          onClick={() => handleNavigation("/help")}
-          className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
-            isActive("/help") ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30" : "hover:bg-[#2563EB]"
-          }`}
-        >
-          <FaQuestionCircle className={`text-2xl ${isActive("/help") ? "text-white" : "hover:text-white"}`} />
-          <span>Help</span>
-        </motion.button>
+        {/* Show only OnBoarding if userActive is false and userRole is distributor */}
+        {userActive === false && userRole === "distributor" ? (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            onClick={() => handleNavigation("/Profile")}
+            className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+              isActive("/Profile")
+                ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                : "hover:bg-[#2563EB]"
+            }`}
+          >
+            <FaUser className="text-2xl" />
+            <span>OnBoarding</span>
+          </motion.button>
+        ) : (
+          // Show all other buttons when userActive is true OR userRole is not "distributor"
+          <>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => handleNavigation("/Dashboard")}
+              className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+                isActive("/Dashboard")
+                  ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                  : "hover:bg-[#2563EB]"
+              }`}
+            >
+              <FaTachometerAlt className="text-2xl" />
+              <span>Dashboard</span>
+            </motion.button>
+  
+            {/* Hide OnBoarding if userActive is true and userRole is "distributor" OR userRole is "Zone" */}
+            {!((userActive === true && userRole === "distributor") || userRole === "Zone") && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                onClick={() => handleNavigation("/Profile")}
+                className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+                  isActive("/Profile")
+                    ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                    : "hover:bg-[#2563EB]"
+                }`}
+              >
+                <FaUser className="text-2xl" />
+                <span>OnBoarding</span>
+              </motion.button>
+            )}
+  
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => handleNavigation("/create-user")}
+              className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+                isActive("/create-user")
+                  ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                  : "hover:bg-[#2563EB]"
+              }`}
+            >
+              <FaUserPlus className="text-2xl" />
+              <span>Create User</span>
+            </motion.button>
+  
+            {userRole !== "distributor" && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                onClick={() => handleNavigation("/Products")}
+                className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+                  isActive("/Products")
+                    ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                    : "hover:bg-[#2563EB]"
+                }`}
+              >
+                <FaBox className="text-2xl" />
+                <span>Products</span>
+              </motion.button>
+            )}
+  
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => handleNavigation("/transactions")}
+              className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+                isActive("/transactions")
+                  ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                  : "hover:bg-[#2563EB]"
+              }`}
+            >
+              <FaExchangeAlt className="text-2xl" />
+              <span>Transactions</span>
+            </motion.button>
+  
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => handleNavigation("/settings")}
+              className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+                isActive("/settings")
+                  ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                  : "hover:bg-[#2563EB]"
+              }`}
+            >
+              <FaCog className="text-2xl" />
+              <span>Settings</span>
+            </motion.button>
+  
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => handleNavigation("/help")}
+              className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+                isActive("/help")
+                  ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                  : "hover:bg-[#2563EB]"
+              }`}
+            >
+              <FaQuestionCircle className="text-2xl" />
+              <span>Help</span>
+            </motion.button>
+          </>
+        )}
       </nav>
     </motion.aside>
   );
+  
 };
 
 export default Sidebar;

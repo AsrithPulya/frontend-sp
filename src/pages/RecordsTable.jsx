@@ -8,7 +8,10 @@ const RecordsTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [email, setEmail] = useState("");
-  const navigate = useNavigate()
+  const [isCreatingDistributor, setIsCreatingDistributor] = useState(false); // New loading state
+
+  const navigate = useNavigate();
+
   const fetchData = async () => {
     setLoading(true);
     setError(null);
@@ -44,8 +47,11 @@ const RecordsTable = () => {
     }
   };
 
+
+
   useEffect(() => {
     fetchData();
+    // fetchdistributor()
   }, []);
 
   const handleOpenModal = (record) => {
@@ -59,45 +65,45 @@ const RecordsTable = () => {
     setEmail(""); // Reset email field when closing
   };
 
-  const handleCreateDistributor = async() => {
-    // const token = localStorage.getItem("authToken");
-    const userunder = localStorage.getItem("user_under")
-    if (!userunder) {
-      return;
-    }
+  const handleCreateDistributor = async () => {
+    const userunder = localStorage.getItem("user_under");
+    if (!userunder) return;
+
     if (!email) {
       alert("Please enter an email.");
       return;
     }
-   const formDataToSend = new FormData()
-   formDataToSend.append("uname",email)
-   formDataToSend.append("usertype","Distributor")
-   formDataToSend.append("ltype","email")
-   formDataToSend.append("user_under",userunder)
 
-   console.log(formDataToSend)
+    setIsCreatingDistributor(true); // Set loading state
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("uname", email);
+    formDataToSend.append("usertype", "Distributor");
+    formDataToSend.append("ltype", "email");
+    formDataToSend.append("user_under", userunder);
+
     try {
-      const res = await fetch("http://test.sabbpe.com/api/v1/auth/createdistributor",{
-        method:"POST",
-        body: formDataToSend,
-      })
+      const res = await fetch(
+        "http://test.sabbpe.com/api/v1/auth/createdistributor",
+        {
+          method: "POST",
+          body: formDataToSend,
+        }
+      );
       const result = await res.json();
-      console.log(result)
+
       if (!res.ok) {
         throw new Error(result.message || "Failed to create distributor.");
       }
+
       alert("Distributor created successfully!");
       handleCloseModal();
-      navigate("/distributors")
+      navigate("/distributors");
     } catch (error) {
-      console.log(error)
+      console.log(error);
+    } finally {
+      setIsCreatingDistributor(false); // Reset loading state
     }
-
-    console.log("Creating distributor for:", selectedRecord, "Email:", email);
-    // Here you can send the email and selectedRecord data to your API
-
-    // Close modal after action
-    handleCloseModal();
   };
 
   return (
@@ -158,9 +164,6 @@ const RecordsTable = () => {
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4">Create Distributor</h2>
-            <p className="text-gray-700 mb-2">
-              {/* Creating distributor for: <strong>{selectedRecord?.bank_name}</strong> */}
-            </p>
             <input
               type="email"
               placeholder="Enter email"
@@ -172,14 +175,41 @@ const RecordsTable = () => {
               <button
                 onClick={handleCloseModal}
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded"
+                disabled={isCreatingDistributor}
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateDistributor}
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded"
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded flex items-center justify-center"
+                disabled={isCreatingDistributor}
               >
-                Create
+                {isCreatingDistributor ? (
+                  <span className="flex items-center">
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="white"
+                        strokeWidth="4"
+                        fill="none"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="white"
+                        d="M4 12a8 8 0 018-8v8H4z"
+                      ></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  "Create"
+                )}
               </button>
             </div>
           </div>

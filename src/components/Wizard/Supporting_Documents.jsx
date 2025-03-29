@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const SupportingDocuments = ({ formData, setFormData, setStepComplete }) => {
+const SupportingDocuments = ({ formData, setFormData, setStepComplete ,stepComplete}) => {
   const prevCompleteRef = useRef(false);
   const fileInputRef = useRef(null);
   const [documentList, setDocumentList] = useState([]);
@@ -50,15 +50,17 @@ const SupportingDocuments = ({ formData, setFormData, setStepComplete }) => {
     return statusMap[doc.verifyStatus] || { status: "Uploaded", color: "bg-gray-100 text-gray-800" };
   };
 
+  console.log(documentList)
+
   useEffect(() => {
     // Enable submit button only if there are documents in localStorage
     const hasDocuments = documentList.length > 0;
     
     if (hasDocuments !== prevCompleteRef.current) {
-      setStepComplete(hasDocuments); // True only if documents exist in localStorage
+      setStepComplete(4,hasDocuments); // True only if documents exist in localStorage
       prevCompleteRef.current = hasDocuments;
     }
-  }, [documentList, setStepComplete]);
+  }, [documentList, formData.uploadedDocuments, setStepComplete]);
 
   return (
     <div className="space-y-8">

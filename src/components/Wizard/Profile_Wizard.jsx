@@ -52,8 +52,14 @@ const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
   });
 
   const handleStepComplete = useCallback((stepNum, complete) => {
-    setStepComplete((prev) => ({ ...prev, [stepNum]: complete }));
+    setStepComplete((prev) => {
+      if (prev[stepNum] !== complete) {
+        return { ...prev, [stepNum]: complete }; // Update only if it has changed
+      }
+      return prev;
+    });
   }, []);
+  
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -61,7 +67,6 @@ const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
     try {
       const uploadedDocs = JSON.parse(localStorage.getItem("uploadedDocs") || "{}");
       const token = localStorage.getItem("authToken"); // Assuming the token is stored with key "token"
-  
       const submissionData = {
         fullName: formData.fullName,
         mobileNumber: formData.mobile,
@@ -127,7 +132,7 @@ const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
     { number: 3, label: "Bank Details", subLabel: "Setup Bank Details" },
     { number: 4, label: "Supporting Docs", subLabel: "Upload Documents" },
   ];
-
+  // console.log(stepComplete)
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Navbar is in App.js */}
@@ -226,15 +231,22 @@ const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
                     Next →
                   </button>
                 ) : (
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!stepComplete[step]}
-                    className={`px-6 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-400 ${
-                      !stepComplete[step] ? "opacity-50 cursor-not-allowed" : "hover:from-green-600 hover:to-teal-600"
-                    }`}
-                  >
-                    Submit
-                  </button>
+                  // <button
+                  //   onClick={handleSubmit}
+                  //   disabled={!stepComplete[step]}
+                  //   className={`px-6 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-400 ${
+                  //     !stepComplete[step] ? "opacity-50 cursor-not-allowed" : "hover:from-green-600 hover:to-teal-600"
+                  //   }`}
+                  // >
+                  //   Submit
+                  // </button>
+                   <button
+                   onClick={handleSubmit}
+                  //  disabled={!stepComplete[step]}
+                   className={`px-6 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-400`}
+                 >
+                   Submit
+                 </button>
                 )}
               </div>
             </div>

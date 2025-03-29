@@ -2,10 +2,20 @@ import React, { useState } from "react";
 import { FaUserCircle, FaSearch, FaBell } from "react-icons/fa";
 import logo from "../assets/Logo.jpeg";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user_under");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("usertype");
+    localStorage.removeItem("isProfile");
+    navigate("/");
+  };
   return (
     <motion.header
       initial={{ y: -100 }}
@@ -24,10 +34,10 @@ const Navbar = ({ toggleSidebar }) => {
           alt="Logo"
           className="h-12 w-12 rounded-full shadow-md border-2 border-blue-500"
         />
-        <h1 className="text-3xl font-bold text-gray-800 tracking-wide">SABBPE</h1>
+        <h1 className="text-3xl font-bold text-gray-800 tracking-wide">
+          SABBPE
+        </h1>
       </div>
-
-     
 
       {/* Right Section: Search, Notifications, Profile */}
       <div className="flex items-center space-x-6">
@@ -86,8 +96,8 @@ const Navbar = ({ toggleSidebar }) => {
                 </li>
                 <li>
                   <a
-                    href="#"
-                    className="block px-4 py-3 text-base text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+                    onClick={handleLogout}
+                    className="block px-4 py-3 text-base text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer"
                   >
                     Logout
                   </a>
@@ -103,8 +113,19 @@ const Navbar = ({ toggleSidebar }) => {
           onClick={toggleSidebar}
           className="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none transition-colors"
         >
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          <svg
+            className="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </motion.button>
       </div>

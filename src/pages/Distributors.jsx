@@ -57,8 +57,8 @@ console.log(distributors)
             <tr className="bg-gray-200">
             <th className="border border-gray-300 px-4 py-2">User Id</th>
               <th className="border border-gray-300 px-4 py-2">Full Name</th>
-              <th className="border border-gray-300 px-4 py-2">Mobile Number</th>
-              <th className="border border-gray-300 px-4 py-2">Email</th>
+              {/* <th className="border border-gray-300 px-4 py-2">Mobile Number</th> */}
+              {/* <th className="border border-gray-300 px-4 py-2">Email</th> */}
               <th className="border border-gray-300 px-4 py-2">Business Name</th>
               <th className="border border-gray-300 px-4 py-2">Entity Type</th>
               <th className="border border-gray-300 px-4 py-2">Account Status</th>
@@ -69,8 +69,8 @@ console.log(distributors)
               <tr key={index} className="border border-gray-300">
                 <td className="border border-gray-300 px-4 py-2 text-center">{record.user_id}</td>
                 <td className="border border-gray-300 px-4 py-2 text-center">{record.full_name}</td>
-                <td className="border border-gray-300 px-4 py-2 text-center">{record.mobile_number}</td>
-                <td className="border border-gray-300 px-4 py-2 text-center">{record.email}</td>
+                {/* <td className="border border-gray-300 px-4 py-2 text-center">{record.mobile_number}</td> */}
+                {/* <td className="border border-gray-300 px-4 py-2 text-center">{record.email}</td> */}
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {record.business_name}
                 </td>
@@ -79,9 +79,9 @@ console.log(distributors)
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {record.account_status=== 1 ? (
-                    <span className="text-green-500 font-semibold">Success</span>
+                    <span className="text-green-500 font-semibold">Active</span>
                   ) : (
-                    <span className="text-red-500 font-semibold">Pending</span>
+                    <span className="text-red-500 font-semibold">Processing</span>
                   )}
                 </td>
               </tr>
