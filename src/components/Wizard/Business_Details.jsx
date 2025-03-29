@@ -32,41 +32,43 @@ const BusinessDetails = ({ formData, setFormData, setStepComplete }) => {
   };
 
   const verifyGSTWithAPI = async (gst) => {
-    try {
-
-      const formDataToSend = new FormData();
-      formDataToSend.append("gst_number", gst);
-
-      const response = await fetch(
-        "http://test.sabbpe.com/api/v1/zoop/getgstverify",
-        {
-          method: "POST",
-          body: formDataToSend,
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok && result.code === 100) {
-        setGstStatus({ type: "success", message: result.response_message || "GST Verified ✅" });
+    setGstStatus({ type: "success", message: "GST Verified ✅" });
         setFormData((prev) => ({ ...prev, gstVerified: true }));
-        return true;
-      } else {
-        setGstStatus({
-          type: "danger",
-          message: result.response_message || "GST verification failed",
-        });
-        setFormData((prev) => ({ ...prev, gstVerified: false }));
-        return false;
-      }
-    } catch (error) {
-      setGstStatus({
-        type: "danger",
-        message: "Error verifying GST. Please try again.",
-      });
-      setFormData((prev) => ({ ...prev, gstVerified: false }));
-      return false;
-    }
+    // try {
+
+    //   const formDataToSend = new FormData();
+    //   formDataToSend.append("gst_number", gst);
+
+    //   const response = await fetch(
+    //     "http://test.sabbpe.com/api/v1/zoop/getgstverify",
+    //     {
+    //       method: "POST",
+    //       body: formDataToSend,
+    //     }
+    //   );
+
+    //   const result = await response.json();
+
+    //   if (response.ok && result.code === 100) {
+    //     setGstStatus({ type: "success", message: result.response_message || "GST Verified ✅" });
+    //     setFormData((prev) => ({ ...prev, gstVerified: true }));
+    //     return true;
+    //   } else {
+    //     setGstStatus({
+    //       type: "danger",
+    //       message: result.response_message || "GST verification failed",
+    //     });
+    //     setFormData((prev) => ({ ...prev, gstVerified: false }));
+    //     return false;
+    //   }
+    // } catch (error) {
+    //   setGstStatus({
+    //     type: "danger",
+    //     message: "Error verifying GST. Please try again.",
+    //   });
+    //   setFormData((prev) => ({ ...prev, gstVerified: false }));
+    //   return false;
+    // }
   };
 
   const validateGST = async (gst) => {

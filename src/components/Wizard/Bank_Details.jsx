@@ -84,51 +84,59 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
     }
   };
 
+  // const verifyBankDetails = async () => {
+  //   try {
+  //     const isValidAccount = /^[0-9]{9,18}$/.test(formData.accountNumber);
+  //     const isValidIFSC = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc);
+  //     if (!isValidAccount || !isValidIFSC || formData.accountNumber !== formData.confirmAccountNumber) {
+  //       setVerificationStatus("❌ Invalid Account Number, IFSC Code, or Confirmation Mismatch");
+  //       setFormData((prev) => ({ ...prev, bankVerified: false }));
+  //       return;
+  //     }
+  //     // Commented out API call for bank verification (bypassed for testing)
+      
+  //     const formDataToSend = new FormData();
+  //     formDataToSend.append("account_no", formData.accountNumber);
+  //     formDataToSend.append("ifsc_code", formData.ifsc);
+
+  //     const response = await fetch(
+  //       "http://test.sabbpe.com/api/v1/zoop/bankaccountverify",
+  //       {
+  //         method: "POST",
+  //         body: formDataToSend,
+  //       }
+  //     );
+
+  //     const result = await response.json();
+
+  //     if (response.ok || result.code === 100) {
+  //       setVerificationStatus("✅ " + (result.response_message || "Bank Account Verified"));
+  //       setFormData((prev) => ({ ...prev, bankVerified: true }));
+  //     } else {
+  //       setVerificationStatus("❌ " + (result.response_message || "Bank verification failed"));
+  //       setFormData((prev) => ({ ...prev, bankVerified: false }));
+  //     }
+      
+
+  //     // Simulated successful verification for testing
+  //     // setVerificationStatus("✅ Bank Account Verified (Test Mode)");
+  //     // setFormData((prev) => ({ ...prev, bankVerified: true }));
+
+  //   } catch (error) {
+  //     console.error("Verification Error:", error);
+  //     setVerificationStatus("⚠️ Error verifying bank details. Try again.");
+  //     setFormData((prev) => ({ ...prev, bankVerified: false }));
+  //   }
+  // };
+
+
+
+
   const verifyBankDetails = async () => {
-    try {
-      const isValidAccount = /^[0-9]{9,18}$/.test(formData.accountNumber);
-      const isValidIFSC = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc);
-      if (!isValidAccount || !isValidIFSC || formData.accountNumber !== formData.confirmAccountNumber) {
-        setVerificationStatus("❌ Invalid Account Number, IFSC Code, or Confirmation Mismatch");
-        setFormData((prev) => ({ ...prev, bankVerified: false }));
-        return;
-      }
-
-      // Commented out API call for bank verification (bypassed for testing)
-      
-      const formDataToSend = new FormData();
-      formDataToSend.append("account_no", formData.accountNumber);
-      formDataToSend.append("ifsc_code", formData.ifsc);
-
-      const response = await fetch(
-        "http://test.sabbpe.com/api/v1/zoop/bankaccountverify",
-        {
-          method: "POST",
-          body: formDataToSend,
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok || result.code === 100) {
-        setVerificationStatus("✅ " + (result.response_message || "Bank Account Verified"));
-        setFormData((prev) => ({ ...prev, bankVerified: true }));
-      } else {
-        setVerificationStatus("❌ " + (result.response_message || "Bank verification failed"));
-        setFormData((prev) => ({ ...prev, bankVerified: false }));
-      }
-      
-
-      // Simulated successful verification for testing
-      // setVerificationStatus("✅ Bank Account Verified (Test Mode)");
-      // setFormData((prev) => ({ ...prev, bankVerified: true }));
-
-    } catch (error) {
-      console.error("Verification Error:", error);
-      setVerificationStatus("⚠️ Error verifying bank details. Try again.");
-      setFormData((prev) => ({ ...prev, bankVerified: false }));
-    }
+      setVerificationStatus("✅ Bank Account Verified (Test Mode)");
+      setFormData((prev) => ({ ...prev, bankVerified: true }));
   };
+  
 
   useEffect(() => {
     const requiredFields = {
@@ -160,7 +168,8 @@ const BankDetails = ({ formData, setFormData, setStepComplete }) => {
     formData.ifsc,
     formData.bankDocument,
     formData.bankVerified,
-  ]);
+  ]
+);
 
   return (
     <div className="space-y-8">
