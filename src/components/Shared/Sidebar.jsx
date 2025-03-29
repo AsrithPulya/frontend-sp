@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaTableList } from "react-icons/fa6";
+import { FaTableList,FaPeopleGroup } from "react-icons/fa6";
 import {
   FaTachometerAlt,
   FaUserPlus,
@@ -9,6 +9,7 @@ import {
   FaExchangeAlt,
   FaCog,
   FaQuestionCircle,
+
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 
@@ -17,6 +18,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
   const [userActive, setUserActive] = useState(false);
   const isPayment = localStorage.getItem("isPayment")==="true"
+  
   // console.log(isPayment)
   const userRole = localStorage.getItem("userRole");
   const isActive = (path) => location.pathname === path;
@@ -59,11 +61,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
-  console.log(userActive);
+  // console.log(userActive);
 
   useEffect(() => {
     fetchDetails();
   }, []);
+
+  
 
   useEffect(() => {
     if (userRole === "Zone") {
@@ -179,6 +183,23 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <FaTableList className="text-2xl" />
                 {/* <FaExchangeAlt className="text-2xl" /> */}
                 <span>Records Table</span>
+              </motion.button>
+            )}
+
+            {/* distributors */}
+            {isPayment && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                onClick={() => handleNavigation("/distributors")}
+                className={`w-full flex items-center space-x-4 p-4 text-lg font-medium text-gray-100 rounded-xl transition-all duration-300 ${
+                  isActive("/distributors")
+                    ? "bg-[#3B82F6] text-white shadow-lg shadow-blue-500/30"
+                    : "hover:bg-[#2563EB]"
+                }`}
+              >
+                <FaPeopleGroup className="text-2xl" />
+                {/* <FaExchangeAlt className="text-2xl" /> */}
+                <span>Distributors</span>
               </motion.button>
             )}
 

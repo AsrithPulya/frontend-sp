@@ -174,7 +174,12 @@ const Login = () => {
         draggable: true,
         progress: undefined,
       });
-      navigate("/dashboard");
+      if(response.data.ispayment){
+        navigate("/dashboard");
+      }else{
+        navigate("/Products")
+      }
+      
     } catch (err) {
       console.error("Error Details (Verify OTP):", {
         message: err.message,
