@@ -16,6 +16,11 @@ const Navbar = ({ toggleSidebar }) => {
     localStorage.removeItem("isProfile");
     navigate("/");
   };
+
+  const handleMyProfile = () => {
+    navigate('/my-profile')
+    setIsDropdownOpen(!isDropdownOpen)
+  }
   return (
     <motion.header
       initial={{ y: -100 }}
@@ -80,7 +85,7 @@ const Navbar = ({ toggleSidebar }) => {
               <ul className="py-2">
                 <li>
                   <a
-                    onClick={()=>navigate('/my-profile')}
+                    onClick={()=>handleMyProfile()}
                     className="block px-4 py-3 text-base cursor-pointer text-gray-800 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                   >
                     My Profile

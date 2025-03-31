@@ -5,9 +5,11 @@ import PersonalDetails from "./Personal_Details";
 import BusinessDetails from "./Business_Details";
 import BankDetails from "./Bank_Details";
 import SupportingDocuments from "./Supporting_Documents";
+import { useNavigate } from "react-router-dom";
 
 const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
   const [step, setStep] = useState(1);
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
@@ -119,7 +121,8 @@ const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
       const result = await response.json();
       console.log("API Response:", result);
       alert("Form Submitted Successfully!");
-  
+      navigate("/my-profile")
+      localStorage.setItem("profileSubmitted",true)
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Failed to submit form. Please try again.");

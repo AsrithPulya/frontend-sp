@@ -19,6 +19,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [userActive, setUserActive] = useState(false);
   const isPayment = localStorage.getItem("isPayment")==="true"
   
+  const distributorProfileSubmitted = localStorage.getItem("profileSubmitted")
+  console.log(distributorProfileSubmitted)
   // console.log(isPayment)
   const userRole = localStorage.getItem("userRole");
   const isActive = (path) => location.pathname === path;
@@ -65,7 +67,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   useEffect(() => {
     fetchDetails();
-  }, []);
+  }, [distributorProfileSubmitted]);
 
   
 
