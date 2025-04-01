@@ -2,6 +2,44 @@ import { useScroll } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const indianStates = [
+  "Andaman and Nicobar Islands",
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chandigarh",
+  "Chhattisgarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jammu and Kashmir",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Ladakh",
+  "Lakshadweep",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Puducherry",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+];
 const Distributors = () => {
   const [distributors, setDistributors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -9,9 +47,14 @@ const Distributors = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [email, setEmail] = useState("");
+  const [state, setState] = useState("");
+  const [city,setCity] = useState("")
   const [isCreatingDistributor, setIsCreatingDistributor] = useState(false); // New loading state
   const navigate = useNavigate();
 
+
+
+  console.log(state)
   const fetchData = async () => {
     setLoading(true);
     setError(null);
@@ -78,6 +121,8 @@ const Distributors = () => {
     formDataToSend.append("usertype", "Distributor");
     formDataToSend.append("ltype", "email");
     formDataToSend.append("user_under", userunder);
+    formDataToSend.append("user_state",state)
+    formDataToSend.append("user_city",city)
     try {
       const res = await fetch(
         "http://test.sabbpe.com/api/v1/auth/createdistributor",
@@ -103,8 +148,10 @@ const Distributors = () => {
     }
   };
 
+  console.log(distributors)
+
   return (
-    <div className="pt-5">
+    <div className="pt-5 px-5">
       <div className="flex justify-between px-5 py-5">
         <p className="font-bold text-xl">Distributors</p>
         <button
@@ -130,6 +177,9 @@ const Distributors = () => {
                 Business Name
               </th>
               <th className="border border-gray-300 px-4 py-2">Entity Type</th>
+              <th className="border border-gray-300 px-4 py-2">State</th>
+              <th className="border border-gray-300 px-4 py-2">City</th>
+
               <th className="border border-gray-300 px-4 py-2">
                 Account Status
               </th>
@@ -153,6 +203,12 @@ const Distributors = () => {
                   {record.entity_type}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
+                  {record.user_state}
+                </td>
+                <td className="border border-gray-300 px-4 py-2 text-center">
+                  {record.user_city === "" ? "-" : record.user_city}
+                </td>
+                <td className="border border-gray-300 px-4 py-2 text-center">
                   {record.account_status === 1 ? (
                     <span className="text-green-500 font-semibold">Active</span>
                   ) : (
@@ -170,7 +226,7 @@ const Distributors = () => {
       {!loading && !error && distributors.length === 0 && (
         <p>No records found.</p>
       )}
-       {showModal && (
+      {showModal && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4">Create Distributor</h2>
@@ -180,19 +236,48 @@ const Distributors = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full border border-gray-300 rounded p-2 mb-4"
+              required
             />
-            <div className="flex justify-end space-x-2">
+            <div>
+            <select
+              id="state"
+              name="state"
+              value={state}
+              onChange={(e) => setState(e.target.value)}
+              className="w-full p-2 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:shadow-md"
+              required
+            >
+              <option value="" disabled>
+                Select a state
+              </option>
+              {indianStates.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="City"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="w-full border border-gray-300 rounded p-2 mt-4"
+              
+            />
+            </div>
+           
+            <div className="flex justify-end space-x-2 mt-5">
               <button
                 onClick={handleCloseModal}
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded"
-                disabled={isCreatingDistributor}
+                disabled={isCreatingDistributor }
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateDistributor}
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded flex items-center justify-center"
-                disabled={isCreatingDistributor}
+                disabled={isCreatingDistributor || email==="" || state === ""}
               >
                 {isCreatingDistributor ? (
                   <span className="flex items-center">

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaTableList,FaPeopleGroup } from "react-icons/fa6";
+import { FaTableList, FaPeopleGroup } from "react-icons/fa6";
 import {
   FaTachometerAlt,
   FaUserPlus,
@@ -9,7 +9,6 @@ import {
   FaExchangeAlt,
   FaCog,
   FaQuestionCircle,
-
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 
@@ -17,10 +16,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [userActive, setUserActive] = useState(false);
-  const isPayment = localStorage.getItem("isPayment")==="true"
-  
-  const distributorProfileSubmitted = localStorage.getItem("profileSubmitted")
-  console.log(distributorProfileSubmitted)
+  const isPayment = localStorage.getItem("isPayment") === "true";
+  const [loading, setLoading] = useState(false);
+  const distributorProfileSubmitted = localStorage.getItem("profileSubmitted");
+  // console.log(distributorProfileSubmitted)
   // console.log(isPayment)
   const userRole = localStorage.getItem("userRole");
   const isActive = (path) => location.pathname === path;
@@ -37,6 +36,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     if (!token) {
       return;
     }
+    setLoading(true);
     try {
       const response = await fetch(
         "http://test.sabbpe.com/api/v1/auth/fetchdistributor",
@@ -55,11 +55,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       console.log(data);
       if (data.isprofile === false) {
         setUserActive(data.isprofile);
+        setLoading(false);
       } else if (data[0].account_status === 1) {
         setUserActive(true);
+        setLoading(false);
       }
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
@@ -69,8 +72,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     fetchDetails();
   }, [distributorProfileSubmitted]);
 
-  
-
   useEffect(() => {
     if (userRole === "Zone") {
       return; // Allow "Zone" users to access all pages freely
@@ -78,7 +79,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     if (userActive === false && userRole === "distributor") {
       navigate("/Profile");
     } else {
-      navigate("/Dashboard");
+      navigate("/my-profile");
     }
   }, [userRole, userActive]);
 
@@ -96,8 +97,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       </div>
       <div className="border-t border-gray-500 my-4"></div>
       <nav className="space-y-3">
-        {/* Show only OnBoarding if userActive is false and userRole is distributor */}
-        {userActive === false && userRole === "distributor" ? (
+        {loading ? (
+          <div className="grid gap-5">
+            <div className="inline-block rounded-xl bg-gray-300 animate-pulse w-full space-x-4 p-4 h-12"></div>
+            <div className="inline-block rounded-xl bg-gray-300 animate-pulse w-full space-x-4 p-4 h-12"></div>
+            <div className="inline-block rounded-xl bg-gray-300 animate-pulse w-full space-x-4 p-4 h-12"></div>
+            <div className="inline-block rounded-xl bg-gray-300 animate-pulse w-full space-x-4 p-4 h-12"></div>
+            <div className="inline-block rounded-xl bg-gray-300 animate-pulse w-full space-x-4 p-4 h-12"></div>
+          </div>
+        ) : // Show only OnBoarding if userActive is false and userRole is distributor
+        userActive === false && userRole === "distributor" ? (
           <motion.button
             whileHover={{ scale: 1.05 }}
             onClick={() => handleNavigation("/Profile")}
@@ -172,6 +181,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <span>Products</span>
               </motion.button>
             )}
+
             {isPayment && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -183,7 +193,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 }`}
               >
                 <FaTableList className="text-2xl" />
-                {/* <FaExchangeAlt className="text-2xl" /> */}
                 <span>Records Table</span>
               </motion.button>
             )}
@@ -200,7 +209,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 }`}
               >
                 <FaPeopleGroup className="text-2xl" />
-                {/* <FaExchangeAlt className="text-2xl" /> */}
                 <span>Distributors</span>
               </motion.button>
             )}
