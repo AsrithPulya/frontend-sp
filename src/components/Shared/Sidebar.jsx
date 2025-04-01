@@ -11,6 +11,7 @@ import {
   FaQuestionCircle,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -18,7 +19,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [userActive, setUserActive] = useState(false);
   const isPayment = localStorage.getItem("isPayment") === "true";
   const [loading, setLoading] = useState(false);
-  const distributorProfileSubmitted = localStorage.getItem("profileSubmitted");
+  const {refreshNavbar} = useSelector((state)=>state.navbar)
+  // console.log(refreshNavbar)
   // console.log(distributorProfileSubmitted)
   // console.log(isPayment)
   const userRole = localStorage.getItem("userRole");
@@ -70,7 +72,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   useEffect(() => {
     fetchDetails();
-  }, [distributorProfileSubmitted]);
+  }, [refreshNavbar]);
 
   useEffect(() => {
     if (userRole === "Zone") {
