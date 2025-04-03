@@ -12,7 +12,7 @@ const Login = () => {
   const [otpSent, setOtpSent] = useState(false);
   const navigate = useNavigate();
   const [role, setRole] = useState("");
-  console.log(role)
+  // console.log(role)
   const mockOtp = "147369"; // For testing purposes; replace with API response later
 
   const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
@@ -253,7 +253,7 @@ const Login = () => {
                   onChange={() => setRole("Zone")}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-[15px]">Zonal</span>
+                <span className="text-[15px]">Zonal Distributor</span>
               </label>
               <label className="flex items-center space-x-2">
                 <input
@@ -264,7 +264,7 @@ const Login = () => {
                   onChange={() => setRole("distributor")}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-[15px]">Distributor</span>
+                <span className="text-[15px]">Regional Distributor</span>
               </label>
             </div>
           </div>

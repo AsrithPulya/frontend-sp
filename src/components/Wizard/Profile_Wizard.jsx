@@ -8,6 +8,7 @@ import SupportingDocuments from "./Supporting_Documents";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { triggerNavbarRefresh } from "../../redux/SidebarSlice";
+import { toast } from "react-toastify";
 
 const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
   const dispatch = useDispatch()
@@ -123,7 +124,16 @@ const ProfileWizard = ({ isSidebarOpen, toggleSidebar }) => {
   
       const result = await response.json();
       console.log("API Response:", result);
-      alert("Form Submitted Successfully!");
+      toast.success("Profile Created",{
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
+      // alert("Form Submitted Successfully!");
       navigate("/my-profile")
       dispatch(triggerNavbarRefresh())
       // localStorage.setItem("profileSubmitted",true)
