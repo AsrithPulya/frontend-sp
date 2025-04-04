@@ -13,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 
+
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();

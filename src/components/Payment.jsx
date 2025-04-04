@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Shared/Navbar";
 import Sidebar from "../components/Shared/Sidebar";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 const BankDetails = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const BankDetails = () => {
     const uploadFormData = new FormData();
     uploadFormData.append("file", file);
     // console.log(file)
-    
+
     try {
       const response = await fetch(
         "http://test.sabbpe.com/docs/api/docupload",
@@ -55,7 +56,7 @@ const BankDetails = () => {
           body: uploadFormData,
         }
       );
-      
+
       if (!response.ok) {
         throw new Error("Document upload failed");
       }
@@ -69,14 +70,16 @@ const BankDetails = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsLoading(true);
     try {
       const token = localStorage.getItem("authToken");
       if (!token) {
-        setErrors({ api: "Authentication token not found. Please log in again." });
+        setErrors({
+          api: "Authentication token not found. Please log in again.",
+        });
         setIsLoading(false);
         return;
       }
@@ -90,17 +93,16 @@ const BankDetails = () => {
         setIsLoading(false);
         return;
       }
-     
 
       // Prepare products_selected
-      const productsSelected = selectedProducts.map(p => p.id).join(",");
+      const productsSelected = selectedProducts.map((p) => p.id).join(",");
       if (!productsSelected) {
         setErrors({ api: "No products selected" });
         setIsLoading(false);
         return;
       }
 
-      console.log(fileUrl)
+      console.log(fileUrl);
       const formDataToSend = new FormData();
       formDataToSend.append("bank_name", formData.bankName);
       formDataToSend.append("amount", formData.amount);
@@ -108,17 +110,29 @@ const BankDetails = () => {
       formDataToSend.append("statement_url", fileUrl); // Use the uploaded file URL
       formDataToSend.append("products_selected", productsSelected);
 
-      const response = await fetch("http://test.sabbpe.com/api/v1/profile/zonalpay", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        },
-        body: formDataToSend,
-      });
+      const response = await fetch(
+        "http://test.sabbpe.com/api/v1/profile/zonalpay",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formDataToSend,
+        }
+      );
 
       const data = await response.json();
 
       if (data.code === 200) {
+        toast.success("Payment Successfull", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
         navigate("/records-table", {
           state: {
             selectedProducts,
@@ -132,9 +146,20 @@ const BankDetails = () => {
           navigate("/login");
         }
       }
-   
     } catch (error) {
-      setErrors({ api: "An error occurred while updating payment details: " + error.message });
+      setErrors({
+        api:
+          "An error occurred while updating payment details: " + error.message,
+      });
+      toast.error("An error occurred while updating payment details", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -193,7 +218,8 @@ const BankDetails = () => {
                       ))}
                     </ul>
                     <p className="text-base text-gray-800 font-medium">
-                      Estimated Total: ₹{calculateTotalAmount().toLocaleString()}
+                      Estimated Total: ₹
+                      {calculateTotalAmount().toLocaleString()}
                     </p>
                   </div>
                 </section>
@@ -221,7 +247,9 @@ const BankDetails = () => {
                       placeholder="Enter bank name"
                     />
                     {errors.bankName && (
-                      <p className="mt-2 text-sm text-red-600">{errors.bankName}</p>
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.bankName}
+                      </p>
                     )}
                   </div>
 
@@ -242,7 +270,9 @@ const BankDetails = () => {
                       placeholder="Enter amount"
                     />
                     {errors.amount && (
-                      <p className="mt-2 text-sm text-red-600">{errors.amount}</p>
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.amount}
+                      </p>
                     )}
                   </div>
 
@@ -263,7 +293,9 @@ const BankDetails = () => {
                       placeholder="Enter UTR/Reference No."
                     />
                     {errors.utrRef && (
-                      <p className="mt-2 text-sm text-red-600">{errors.utrRef}</p>
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.utrRef}
+                      </p>
                     )}
                   </div>
 

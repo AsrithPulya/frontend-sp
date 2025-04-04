@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Navbar from "../components/Shared/Navbar";
 import Sidebar from "../components/Shared/Sidebar";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 const UserFormPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -32,8 +33,16 @@ const UserFormPage = () => {
     for (let [key, value] of formDataToSend.entries()) {
       console.log(`${key}: ${value}`);
     }
-
-    alert("Form submitted successfully!");
+    toast.success("User Created", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+    // alert("Form submitted successfully!");
   };
 
   const indianStates = [
@@ -97,10 +106,15 @@ const UserFormPage = () => {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="w-full bg-white p-10 rounded-2xl shadow-xl max-w-3xl mx-auto border border-gray-100"
           >
-            <h2 className="text-3xl font-bold text-gray-800 mb-8">User Details Form</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-8">
+              User Details Form
+            </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="firstName" className="block text-lg font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="firstName"
+                  className="block text-lg font-medium text-gray-700 mb-2"
+                >
                   First Name
                 </label>
                 <input
@@ -115,7 +129,10 @@ const UserFormPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-lg font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="lastName"
+                  className="block text-lg font-medium text-gray-700 mb-2"
+                >
                   Last Name
                 </label>
                 <input
@@ -130,7 +147,10 @@ const UserFormPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-lg font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-lg font-medium text-gray-700 mb-2"
+                >
                   Email
                 </label>
                 <input
@@ -145,7 +165,10 @@ const UserFormPage = () => {
                 />
               </div>
               <div>
-                <label htmlFor="phoneNumber" className="block text-lg font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="phoneNumber"
+                  className="block text-lg font-medium text-gray-700 mb-2"
+                >
                   Phone Number
                 </label>
                 <div className="flex items-center">
@@ -166,7 +189,10 @@ const UserFormPage = () => {
                 </div>
               </div>
               <div>
-                <label htmlFor="state" className="block text-lg font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="state"
+                  className="block text-lg font-medium text-gray-700 mb-2"
+                >
                   State
                 </label>
                 <select

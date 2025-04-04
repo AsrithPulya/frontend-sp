@@ -1,6 +1,7 @@
 import { useScroll } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const indianStates = [
   "Andaman and Nicobar Islands",
@@ -48,13 +49,11 @@ const Distributors = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [email, setEmail] = useState("");
   const [state, setState] = useState("");
-  const [city,setCity] = useState("")
+  const [city, setCity] = useState("");
   const [isCreatingDistributor, setIsCreatingDistributor] = useState(false); // New loading state
   const navigate = useNavigate();
 
-
-
-  console.log(state)
+  console.log(state);
   const fetchData = async () => {
     setLoading(true);
     setError(null);
@@ -121,8 +120,8 @@ const Distributors = () => {
     formDataToSend.append("usertype", "Distributor");
     formDataToSend.append("ltype", "email");
     formDataToSend.append("user_under", userunder);
-    formDataToSend.append("user_state",state)
-    formDataToSend.append("user_city",city)
+    formDataToSend.append("user_state", state);
+    formDataToSend.append("user_city", city);
     try {
       const res = await fetch(
         "http://test.sabbpe.com/api/v1/auth/createdistributor",
@@ -137,7 +136,16 @@ const Distributors = () => {
         throw new Error(result.message || "Failed to create distributor.");
       }
 
-      alert("Distributor created successfully!");
+      // alert("Distributor created successfully!");
+      toast.success("Distributor created Successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       handleCloseModal();
       // navigate("/distributors");
       fetchData();
@@ -148,7 +156,7 @@ const Distributors = () => {
     }
   };
 
-  console.log(distributors)
+  console.log(distributors);
 
   return (
     <div className="pt-5 px-5">
@@ -239,45 +247,44 @@ const Distributors = () => {
               required
             />
             <div>
-            <select
-              id="state"
-              name="state"
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-              className="w-full p-2 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:shadow-md"
-              required
-            >
-              <option value="" disabled>
-                Select a state
-              </option>
-              {indianStates.map((state) => (
-                <option key={state} value={state}>
-                  {state}
+              <select
+                id="state"
+                name="state"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className="w-full p-2 text-base border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:shadow-md"
+                required
+              >
+                <option value="" disabled>
+                  Select a state
                 </option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="City"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="w-full border border-gray-300 rounded p-2 mt-4"
-              
-            />
+                {indianStates.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="text"
+                placeholder="City"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full border border-gray-300 rounded p-2 mt-4"
+              />
             </div>
-           
+
             <div className="flex justify-end space-x-2 mt-5">
               <button
                 onClick={handleCloseModal}
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded"
-                disabled={isCreatingDistributor }
+                disabled={isCreatingDistributor}
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateDistributor}
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded flex items-center justify-center"
-                disabled={isCreatingDistributor || email==="" || state === ""}
+                disabled={isCreatingDistributor || email === "" || state === ""}
               >
                 {isCreatingDistributor ? (
                   <span className="flex items-center">
